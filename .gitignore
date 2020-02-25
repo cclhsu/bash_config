@@ -1,0 +1,9 @@
+
+myenv_template
+mysecrets_template
+*~
+*.bak
+*.orig
+.directory
+.DS_Store
+.vscode
