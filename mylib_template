@@ -1,0 +1,745 @@
+#!/usr/bin/env bash
+#******************************************************************************
+
+# Copyright 2015 Clark Hsu
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#******************************************************************************
+# How To
+
+#******************************************************************************
+# Source
+
+# LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+#******************************************************************************
+
+function check_if_root_user() {
+    if [[ ${UID} -ne 0 ]]; then
+        echo "[Warning] This script was designed for root user.  Please rerun the script as root user!"
+        exit 1
+    fi
+}
+
+#******************************************************************************
+
+function read_and_confirm_password() {
+    if [ "$#" == "3" ]; then
+        eval ${2}="'${3}'"
+    elif [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <message> <variable> [<value>]"
+        exit 1
+    fi
+
+    if [ "${2}" == "PASSWORD" ] && [ "${PASSWORD}" == "" ]; then
+
+        echo -e "\n>> Please enter password: "
+        read -r -s -p "Password: " PASSWORD_01
+
+        echo -e "\n>> Please enter password: "
+        read -r -s -p "Password: " PASSWORD_02
+
+        if [ "${PASSWORD_01}" == "${PASSWORD_02}" ]; then
+            eval ${2}="'${PASSWORD_01}'"
+        else
+            echo -e "\nInput Password not match!"
+            exit 1
+        fi
+    fi
+}
+
+function read_and_confirm() {
+    local REASON=""
+    if [ "$#" == "3" ]; then
+        REASON="${3}"
+    elif [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <message> <variable> [<value>]"
+        exit 1
+    fi
+
+    while [ "${REASON}" == "" ]; do
+        echo -e "\n>> Please enter ${1}: "
+        read -r REASON
+
+        local INPUT=0
+        while [ ${INPUT} -le 0 ] || [ ${INPUT} -ge 3 ]; do
+            echo -e "\n>> Please confirm: ${REASON}"
+            echo " 1) Yes"
+            echo " 2) No"
+            echo -e "\n>> Please enter your choice:"
+            read -r INPUT
+            #echo "Your INPUT is ${INPUT}"
+            case ${INPUT} in
+            1) ;;
+
+            2)
+                REASON=""
+                ;;
+            *)
+                log_e "Invalid INPUT: ${INPUT}"
+                INPUT=0
+                ;;
+            esac
+        done
+    done
+    eval ${2}="'${REASON}'"
+}
+
+function read_multiple_line() {
+    local __resultvar=${1}
+    local RESULT=""
+    while read -r LINE; do
+        if [ "${LINE}" = "" ]; then
+            break
+        fi
+        # RESULT="${RESULT}\n\t${LINE}"
+        RESULT="${RESULT}\n${LINE}"
+    done
+
+    if [[ "${__resultvar}" ]]; then
+        eval ${__resultvar}="'${RESULT}'"
+    else
+        echo "${RESULT}"
+    fi
+}
+
+function read_multiple_line_and_confirm() {
+    local REASON=""
+    if [ "$#" == "3" ]; then
+        REASON="${3}"
+    elif [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <message> <variable> [<value>]"
+        exit 1
+    fi
+
+    while [ "${REASON}" == "" ]; do
+
+        echo -e "\n>> Please enter ${1}: "
+        echo "******************************************************************************"
+        read_multiple_line REASON
+
+        local INPUT=0
+        while [ ${INPUT} -le 0 ] || [ ${INPUT} -ge 3 ]; do
+            echo -e "\n>> Please confirm: ${REASON}"
+            echo " 1) Yes"
+            echo " 2) No"
+            echo -e "\n>> Please enter your choice:"
+            read -r INPUT
+            #echo "Your INPUT is ${INPUT}"
+            case ${INPUT} in
+            1) ;;
+
+            2)
+                REASON=""
+                ;;
+            *)
+                log_e "Invalid INPUT: ${INPUT}"
+                INPUT=0
+                ;;
+            esac
+        done
+    done
+    eval ${2}="'${REASON}'"
+}
+
+function enter_file_name() {
+    local REASON=""
+    if [ "$#" == "4" ]; then
+        REASON="${4}"
+    elif [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <path> <message> <variable> [<value>]"
+        exit 1
+    fi
+
+    while [ "${REASON}" == "" ]; do
+        echo "\nList existing file in ${1}...\n"
+        ls "${1}"
+
+        echo -e "\n>> Please enter ${2}: "
+        read -r REASON
+
+        local INPUT=0
+        while [ ${INPUT} -le 0 ] || [ ${INPUT} -ge 3 ]; do
+            echo -e "\n>> Please confirm: ${REASON}"
+            echo " 1) Yes"
+            echo " 2) No"
+            echo -e "\n>> Please enter your choice:"
+            read -r INPUT
+            #echo "Your INPUT is ${INPUT}"
+            case ${INPUT} in
+            1) ;;
+
+            2)
+                REASON=""
+                ;;
+            *)
+                log_e "Invalid INPUT: ${INPUT}"
+                INPUT=0
+                ;;
+            esac
+        done
+    done
+    eval ${3}="'${REASON}'"
+}
+
+function confirm_yn() {
+    local OPT=""
+    if [ "$#" == "3" ]; then
+        OPT="${3}"
+    elif [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <message> <variable> [<value>]"
+    fi
+
+    local INPUT=0
+    local SIZE=3
+    while [ "${INPUT}" -le 0 ] || [ "${INPUT}" -ge "${SIZE}" ]; do
+        if [ "${OPT}" == "" ] || [ "${OPT}" -le 0 ] || [ "${OPT}" -ge "${SIZE}" ]; then
+            echo -e "\n>> ${1}:"
+            echo " 1) Yes"
+            echo " 2) No"
+            echo -e "\n>> Please enter your choice:"
+            read -r INPUT
+            #echo "Your INPUT is ${INPUT}"
+        elif [ "${OPT}" -gt 0 ] || [ "${OPT}" -lt "${SIZE}" ]; then
+            INPUT=${OPT}
+        fi
+
+        case ${INPUT} in
+        1)
+            ENABLE="yes"
+            ;;
+        2)
+            ENABLE="no"
+            ;;
+        *)
+            log_e "Invalid INPUT: ${INPUT}"
+            INPUT=0
+            ;;
+        esac
+    done
+    eval ${2}="'${ENABLE}'"
+}
+
+function confirm_tf() {
+    local OPT=""
+    if [ "$#" == "3" ]; then
+        OPT="${3}"
+    elif [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <message> <variable> [<value>]"
+    fi
+
+    local INPUT=0
+    local SIZE=3
+    while [ "${INPUT}" -le 0 ] || [ "${INPUT}" -ge "${SIZE}" ]; do
+        if [ "${OPT}" == "" ] || [ "${OPT}" -le 0 ] || [ "${OPT}" -ge "${SIZE}" ]; then
+            echo -e "\n>> ${1}:"
+            echo " 1) True"
+            echo " 2) False"
+            echo -e "\n>> Please enter your choice:"
+            read -r INPUT
+            #echo "Your INPUT is ${INPUT}"
+        elif [ "${OPT}" -gt 0 ] || [ "${OPT}" -lt "${SIZE}" ]; then
+            INPUT=${OPT}
+        fi
+
+        case ${INPUT} in
+        1)
+            ENABLE="true"
+            ;;
+        2)
+            ENABLE="false"
+            ;;
+        *)
+            log_e "Invalid INPUT: ${INPUT}"
+            INPUT=0
+            ;;
+        esac
+    done
+    eval ${2}="'${ENABLE}'"
+}
+
+function select_x_from_path() {
+    if [ "$#" == "4" ]; then
+        TYPE="${4}"
+    elif [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <path> <message> <variable> [<value>]"
+        exit 1
+    fi
+
+    if [ "${4}" == "" ]; then
+        local ROOT_FOLDER="${1}"
+        if [ ! -e "${ROOT_FOLDER}" ]; then
+            log_e "${ROOT_FOLDER} Cannot be found"
+            exit 1
+        fi
+        cd "${ROOT_FOLDER}" || exit
+
+        local OPTIONS=(*)
+        echo -e "\n>> Enter the Number of ${2} to Be Select: "
+        local PS3=">> Please enter your choice: "
+        select OPTION in ${OPTIONS[*]}; do
+            echo "${REPLY} ${OPTIONS[${REPLY} - 1]}"
+            TYPE="${OPTIONS[${REPLY} - 1]}"
+            break
+        done
+
+    fi
+    eval ${3}="'${TYPE}'"
+}
+
+function select_x_from_array() {
+    if [ "$#" == "4" ]; then
+        TYPE="${4}"
+    elif [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <array> <message> <variable> [<value>]"
+        exit 1
+    fi
+
+    if [ "${4}" == "" ]; then
+        read -r -a OPTIONS <<<"${1}"
+        echo -e "\n>> Enter the Number of ${2} to Be Select: "
+        local PS3=">> Please enter your choice: "
+        select OPTION in ${OPTIONS[*]}; do
+            echo "${REPLY} ${OPTIONS[${REPLY} - 1]}"
+            TYPE="${OPTIONS[${REPLY} - 1]}"
+            break
+        done
+    fi
+    eval ${3}="'${TYPE}'"
+}
+
+function select_x_from_file() {
+    if [ "$#" == "4" ]; then
+        TYPE="${4}"
+    elif [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <file> <message> <variable> [<value>]"
+        exit 1
+    fi
+
+    if [ "${4}" == "" ]; then
+        local OPTIONS=()
+        read_option_array_from_configuration_file OPTIONS "${1}"
+        echo -e "\n>> Enter the Number of ${2} to Be Select: "
+        local PS3=">> Please enter your choice: "
+        select OPTION in ${OPTIONS[*]}; do
+            echo "${REPLY} ${OPTIONS[${REPLY} - 1]}"
+            TYPE="${OPTIONS[${REPLY} - 1]}"
+            break
+        done
+    fi
+    eval ${3}="'${TYPE}'"
+}
+
+#******************************************************************************
+
+# read option from a configuration file
+function read_option_array_from_configuration_file() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <variable> <path>"
+        exit 1
+    else
+        i=0
+        while read -r LINE; do # Read a line
+            eval ${1}[i]="'${LINE}'" # Put it into the array
+            i=$((${i} + 1))
+        done <"${2}"
+    fi
+}
+
+#******************************************************************************
+
+function get_new_uuid() {
+    UUID=$(uuidgen)
+    echo "$(to_upper_case ${UUID})"
+}
+
+#******************************************************************************
+
+function to_upper_case() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <string>"
+    else
+        #echo "${1^^}"
+        echo "${1}" | tr "[:lower:]" "[:upper:]"
+        # echo "${1}" | tr "[:lower:]" "[:upper:]" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//' | sed ':a;N;$!ba;s/\n/ /g'
+    fi
+}
+
+function to_lower_case() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <string>"
+    else
+        #echo "${1,,}"
+        echo "${1}" | tr "[:upper:]" "[:lower:]"
+        # echo "${1}" | tr "[:upper:]" "[:lower:]" | sed 's/^[ \t]*//' | sed 's/[ \t]*$//' | sed ':a;N;$!ba;s/\n/ /g'
+    fi
+}
+
+#******************************************************************************
+
+function get_pattern_in_string() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <PATTERN> <STRING>"
+    else
+        echo "${2}" | sed -e "s/.*\(${1}\).*/\1/Ig" | sed -e 's/\(.*\)/\L\1/'
+    fi
+}
+
+function remove_pattern_in_string() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <PATTERN> <STRING>"
+    else
+        # echo "${2}"  | sed -e "s/\s*[([\s]?\s*${1}\s*[])\s]?\s*/ /Ig" | sed 's/^[ \t]*//;s/[ \t]*$//'
+        echo "${2}" | sed -e "s/\s*[([]*\s*${1}\s*[])]*\s*/ /Ig" | sed 's/^[ \t]*//;s/[ \t]*$//'
+    fi
+}
+
+#******************************************************************************
+# https://scottlinux.com/2012/09/01/encode-or-decode-base64-from-the-command-line/
+# [ROT13](https://en.wikipedia.org/wiki/ROT13)
+# [](https://www.linuxquestions.org/questions/linux-software-2/hiding-passwords-in-bash-scirpts-4175576896/page2.html)
+# [hiding passwords in bash scirpts](https://paragonie.com/blog/2015/08/you-wouldnt-base64-a-password-cryptography-decoded#encoding-compression)
+
+function encode_data() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <string>"
+    else
+        echo -n "${1}" | base64
+    fi
+}
+
+function decode_data() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <string>"
+    else
+        # echo -n "${1}" | base64 -d
+        echo -n "${1}" | base64 -D
+    fi
+}
+
+#******************************************************************************
+# http://unix.stackexchange.com/questions/291302/password-encryption-and-decryption
+
+# KEY=$(decode_data cGFzczpxd2VydCFAIyQl)
+KEY=cGFzczpxd2VydCFAIyQl
+
+function encrypt_data() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <string>"
+    else
+        # echo "${1}" | openssl enc -aes-256-cbc -a -e -salt -pass ${KEY}
+        echo "${1}" | openssl enc -aes-256-cbc -a -e -salt -k ${KEY}
+    fi
+}
+
+function decrypt_data() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <string>"
+    else
+        # echo "${1}" | openssl enc -aes-256-cbc -a -d -salt -pass ${KEY}
+        echo "${1}" | openssl enc -aes-256-cbc -a -d -salt -k ${KEY}
+    fi
+}
+
+#******************************************************************************
+
+function find_and_delete_file() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <REG_EXPR>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] Delete ${2} at ${1}"
+
+        cd "${1}" || exit
+        # time sudo find "${1}" -type f -iname "${2}" -print -delete
+
+        time sudo find "${1}" \
+            -type d -iname 'Library' -prune -o \
+            -type f -iname "${2}" -print -delete
+    fi
+}
+
+function find_and_delete_directory() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <REG_EXPR>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] Delete ${2} at ${1}"
+
+        cd "${1}" || exit
+        # time sudo find "${1}" -type d -iname "${2}"-print -delete
+        time sudo find "${1}" -type d -iname "${2}" -exec rm -rf {} \;
+
+        # sudo find "${1}" \( -name '*(*' -o -name '*)*' \) -print -delete
+        # sudo find "${1}" -type d \( -name '*(*' -o -name '*)*' \) -exec rm -rf {} \;
+    fi
+}
+
+function find_directory_x_and_delete_file_y() {
+    if [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <DIR_NAME> <FILE_PATTERN>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] Delete ${3} at ${1}"
+
+        cd "${1}" || exit
+        sudo find "${1}" -type d -iname "${2}" -exec sudo find "{}" -type f -iname "${3}" -print -delete \;
+    fi
+}
+
+function find_type_and_chmod() {
+    if [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <TYPE> <MODE>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] chmod ${2} at ${1}"
+
+        # cd "${1}" || exit
+        time sudo find find "${1}" -type "${2}" -exec chmod ${3} "{}" \;
+    fi
+}
+
+function find_and_chmod() {
+    if [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <FILE_REG_EXP> <MODE>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] chmod ${2} at ${1}"
+
+        cd "${1}" || exit
+        time sudo find "${1}" -name "${2}" -exec chmod ${3} "{}" \;
+    fi
+}
+
+function find_type_and_chown() {
+    if [ "$#" != "3" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <TYPE> <USER> [<GROUP>]"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] chown ${2} at ${1}"
+
+        # cd "${1}" || exit
+        time sudo find find "${1}" -type "${2}" -exec chown ${3}:${4} "{}" \;
+    fi
+}
+
+function find_and_chown() {
+    if [ "$#" != "3" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <FILE_REG_EXP> <USER> [<GROUP>]"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] chown ${2} at ${1}"
+
+        cd "${1}" || exit
+        time sudo find "${1}" -name "${2}" -exec chown ${3}:${4} "{}" \;
+    fi
+}
+
+#******************************************************************************
+
+find_and_delete_0_size_folder() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] Delete Zero Size Folder at ${1}"
+
+        cd "${1}" || exit
+        # time sudo find "${1}" -name '.git*' -prune -o -maxdepth 1 -type d -empty -print -delete
+        time sudo find "${1}" \
+            -name '.git*' -prune -o \
+            -name ".Spotlight-V100" -prune -o \
+            -name ".com.apple.timemachine.donotpresent" -prune -o \
+            -type d -iname 'my*' -prune -o \
+            -type d -iname 'myProject' -prune -o \
+            -type d -iname 'Documents' -prune -o \
+            -type d -iname 'Downloads' -prune -o \
+            -type d -iname 'Google Drive' -prune -o \
+            -type d -iname 'Library' -prune -o \
+            -maxdepth 5 -type d -empty -print -delete
+    fi
+}
+
+find_and_delete_0_size_file() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] Delete Zero File at ${1}"
+
+        cd "${1}" || exit
+        # time sudo find "${1}" -name '.git*' -prune -o -type f -size 0 -print -exec rm -rf {} \;
+        time sudo find "${1}" \
+            -name '.git*' -prune -o \
+            -name ".Spotlight-V100" -prune -o \
+            -name ".com.apple.timemachine.donotpresent" -prune -o \
+            -type d -iname 'my*' -prune -o \
+            -type d -iname 'Documents' -prune -o \
+            -type d -iname 'myProject' -prune -o \
+            -type d -iname 'Downloads' -prune -o \
+            -type d -iname 'Google Drive' -prune -o \
+            -type d -iname 'Library' -prune -o \
+            -type f -iname '__init__.py' -prune -o \
+            -type f -size 0 -print -exec rm -rf {} \;
+    fi
+}
+
+function find_file_size_larger_than() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <SIZE>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] Size larger ${2}MB at ${1}"
+
+        cd "${1}" || exit
+        # time sudo find "${1}" -type f -size +${2}M -exec bash -c "echo -e '\n>> {}...'; ls -alh {}; echo;" "{}" \;
+        time sudo find "${1}" -type f -size +${2}M -exec bash -c "echo -e '\n>> {}...'; ls -alh {}" "{}" \;
+    fi
+}
+
+function find_file_size_smaller_than() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <SIZE>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] Size larger ${2}MB at ${1}"
+
+        cd "${1}" || exit
+        # time sudo find "${1}" -type f -size -${2}M -exec bash -c "echo -e '\n>> {}...'; ls -alh {}; echo;" "{}" \;
+        time sudo find "${1}" -type f -size -${2}M -exec bash -c "echo -e '\n>> {}...'; ls -alh {}" "{}" \;
+    fi
+}
+
+#******************************************************************************
+
+function reformat_file() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <FILE>"
+    elif [ ! -e "${1}" ]; then
+        log_m "Files ${1} doesn't exist"
+    else
+        log_m "Clean Files ${1}"
+
+        # Delete all leading blank lines at top of file (only).
+        sed -i '/./,$!d' "${1}"
+
+        # Delete all trailing blank lines at end of file (only).
+        sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' "${1}"
+
+        # Delete leading white spaces from beginning of file
+        sed -i 's/^ *#!/#!/' "${1}"
+
+        # Delete white spaces from end of line
+        sed -i 's/[[:space:]]\{1,\}$//' "${1}"
+
+        # Add single white line to end of file
+        sed -i -e '$a\' "${1}"
+
+        # if [ "${1}" == "*Makefile" ]; then
+        #     # https://stackoverflow.com/questions/16931770/makefile4-missing-separator-stop
+        #     unexpand -a -t 4 "${1}" > "${1}".tmp; mv "${1}".tmp "${1}";
+        # else
+        #     # Change tab to space of 4
+        #     # https://github.com/wilzbach/shell-tools/blob/master/expandall
+        #     # sed -i 's/^\t/    /g' "${1}"
+        #     # sed -i 's/\t/    /g' "${1}"
+        #     expand -t 4 "${1}" > "${1}".tmp; mv "${1}".tmp "${1}";
+        # fi
+    fi
+}
+
+function reformat_files_in_dir() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <re/*.sh/*.py>"
+    else
+        log_m "Clean Files in ${1} with ${2}"
+
+        # Delete all leading blank lines at top of file (only).
+        find "${1}" -iname "${2}" -type f -print -exec sed -i '/./,$!d' "{}" \;
+
+        # Delete all trailing blank lines at end of file (only).
+        find "${1}" -iname "${2}" -type f -print -exec sed -i -e :a -e '/^\n*$/{$d;N;};/\n$/ba' "{}" \;
+
+        # Delete leading white spaces from beginning of file
+        find "${1}" -iname "${2}" -type f -print -exec sed -i 's/^ *#!/#!/' "{}" \;
+
+        # Delete white spaces from end of line
+        find "${1}" -iname "${2}" -type f -print -exec sed -i 's/[[:space:]]\{1,\}$//' "{}" \;
+
+        # Add single whiteline to end of file
+        find "${1}" -iname "${2}" -type f -print -exec sed -i -e '$a\' "{}" \;
+
+        if [ "${2}" == "*Makefile" ]; then
+            # https://stackoverflow.com/questions/16931770/makefile4-missing-separator-stop
+            # find "${1}" -iname "${2}" -type f -print -exec bash -c 'unexpand -a -t 4 {} > {}.tmp; mv {}.tmp {};' {} \;
+            find "${1}" -iname "${2}" -type f -print -exec bash -c 'i="${1}"; unexpand -a -t 4 "${i}" > "${i}".tmp; mv "${i}".tmp "${i}";' {} \;
+        elif [ "${2}" == "*bats" ]; then
+            :
+        else
+            # Change tab to space of 4
+            # https://github.com/wilzbach/shell-tools/blob/master/expandall
+            # find "${1}" -iname "${2}" -type f -print -exec sed -i 's/^\t/    /g' {} \;
+            # find "${1}" -iname "${2}" -type f -print -exec sed -i 's/\t/    /g' {} \;
+            # find "${1}" -iname "${2}" -type f -print -exec bash -c 'expand -t 4 {} > {}.tmp; mv {}.tmp {};' {} \;
+            find "${1}" -iname "${2}" -type f -print -exec bash -c 'i="${1}"; expand -t 4 "${i}" > "${i}".tmp; mv "${i}".tmp "${i}";' {} \;
+        fi
+
+    fi
+}
+
+#******************************************************************************
+
+function edit_file_in_directory() {
+    if [ "$#" != "2" ] && ["$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <PATH> <PATTERN> [<EDIT>]"
+    else
+        # log_m "${FUNCNAME[0]} ${1} ${2}"
+
+        FILES=$(sudo find "${1}" -maxdepth 1 -iname "${2}" -exec sh -c "basename '{}' | cut -d '.' -f 1 | tr '\n' ' '" \;)
+        select_x_from_array "${FILES}" "FILE" FILE
+        if [ "$#" == "2" ] || [ ${EDIT} != false ]; then
+            echo -e "\n>> Show ${1}...\n"
+            sudo cat "${1}/${FILE}.$(echo ${2}  | cut -d '.' -f 2)"
+        else
+            echo -e "\n>> Show ${1}...\n"
+            sudo vi "${1}/${FILE}.$(echo ${2}  | cut -d '.' -f 2)"
+        fi
+    fi
+}
+
+#******************************************************************************
+
+function list_files_in() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <PATH>"
+    else
+        log_m "${FUNCNAME[0]} ${*}"
+
+        if [ ! -e "${1}" ]; then
+            exit 1
+        fi
+
+        cd "${1}" || exit 1
+        CATEGORIES=("*")
+        select_x_from_array "${CATEGORIES}" "CATEGORY" CATEGORY
+        rm -rf "${TOP_DIR}/lists/${CATEGORY}.txt" || :
+
+        cd "${1}/${CATEGORY}" || exit 1
+        FILES=("*")
+        for FILE in "${FILES[@]}"
+        do
+            echo "${FILE}" >> "${TOP_DIR}/list/${CATEGORY}.txt"
+        done
+    fi
+}

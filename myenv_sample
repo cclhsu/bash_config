@@ -1,0 +1,58 @@
+# cp myenv_template ${HOME}/.myenv
+# cp myenv ${HOME}/.myenv
+
+# # Master Account
+# MASTER_USER=
+# MASTER_PASSWORD=
+PASSWORD=
+
+# # Admin Account
+# OS_ADMIN="admin"
+# OS_ADMIN_PASSWORD=
+
+# # OS User Account
+# USER_HOME='/var/lib'
+# OS_USER="tester"
+# OS_USER_GROUP="${OS_USER}"
+# OS_USER_PASSWORD=
+# OS_USER_EMAIL="${OS_USER}@localhost"
+# OS_USER_HOME="${USER_HOME}/${OS_USER}"
+# OS_USER_BIN="${USER_HOME}/${OS_USER}/bin"
+
+# # DB Admin Account
+# DB_ADMIN="root"
+# DB_ADMIN_PASSWORD=
+
+# # DB User Account
+# DB_NAME="test_db"
+# DB_USER="tester"
+# DB_USER_PASSWORD=
+
+# GitHub Account
+GITHUB_TEAM=
+GITHUB_USER=tester
+GITHUB_USER_PASSWORD=
+GITHUB_USER_EMAIL=tester@example.com
+
+# # GitLab Account
+# GITLAB_TEAM=
+# GITLAB_USER=tester
+# GITLAB_USER_PASSWORD=
+# GITLAB_USER_EMAIL=tester@example.com
+
+# # BitBucket/Jira/Confluence Account
+# BITBUCKET_TEAM=
+# BITBUCKET_USER=tester
+# BITBUCKET_USER_PASSWORD=
+# BITBUCKET_USER_EMAIL=tester@example.com
+
+# Docker
+DOCKER_USER=tester
+DOCKER_PASSWORD=
+
+# # AWS
+# AWS_ACCESS_KEY_ID="<id>"
+# AWS_SECRET_ACCESS_KEY="<key>"
+# AWS_DEFAULT_REGION="<region>"
+
+# # Openstack
