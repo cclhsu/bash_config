@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #******************************************************************************
-
-# Copyright 2015 Clark Hsu
+# Copyright 2020 Clark Hsu
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +16,8 @@
 
 #******************************************************************************
 # How To
+# mkdir -p ${HOME}/.my_libs/bash/
+# cp mylib_template ${HOME}/.my_libs/bash/mylib
 
 #******************************************************************************
 # Source
@@ -25,10 +26,523 @@
 
 #******************************************************************************
 
+#******************************************************************************
+# Function Template
+
+# function function_01() {
+#     if [ "$#" != "1" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+#         log_e "${FUNCNAME[0]} $# ${*}"
+#     else
+#         log_m "${FUNCNAME[0]} $# ${*}"
+#         # cd "${TOP_DIR:?}" || exit 1
+#     fi
+# }
+
+#******************************************************************************
+
+function use_bash() {
+    chsh -s $(which bash)
+    echo ${SHELL}
+    bash --version
+}
+
+# # https://askubuntu.com/questions/17536/how-do-i-create-a-permanent-bash-alias
+# # https://github.com/Bash-it/bash-it/tree/master/aliases/available
+# function use_bash_alias()
+# {
+#     if [ -f ${HOME}/.bash_aliases ]; then
+#         . ${HOME}/.bash_aliases
+#     fi
+# }
+
+#******************************************************************************
+
+function use_zsh() {
+    chsh -s $(which zsh)
+    echo ${SHELL}
+    zsh --version
+}
+
+# function use_zsh_alias()
+# {
+#     if [ -f ${HOME}/.zsh_aliases ]; then
+#         . ${HOME}/.zsh_aliases
+#     fi
+# }
+
+#******************************************************************************
+
+function add_to_bash_history() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        # log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        echo "${1}" >>${HOME}/.bash_history
+        echo "${1}" >>${HOME}/.zsh_history
+    fi
+}
+
+function clean_bash_history() {
+    if [ "$#" != "0" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+    else
+        log_m "${FUNCNAME[0]}" # ${*}
+
+        # echo ${SHELL}
+        # chsh -s /bin/bash
+        # chsh -s /bin/zsh
+
+        history -c >${HOME}/.bash_history >${HOME}/.zsh_history
+        add_to_bash_history "${MYBIN}/clean_files.sh -a clean_directory"
+    fi
+}
+
+#******************************************************************************
+# Remote Function Template
+
+# function create_role_rc() {
+#     if [ "$#" != "2" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <CONFIGURATION_MANAGEMENT_TOP_DIR> <ROLE>"
+#     else
+#         log_m "${FUNCNAME[0]} $# ${*}"
+#         # cd "${TOP_DIR:?}" || exit 1
+#         mkdir -p ${1}/${2}
+#         cat <<\*EOF* >"${1}/${2}/${2}_rc.sh"
+# #!/usr/bin/env bash
+# export ABC="xyz"
+# *EOF*
+#     fi
+# }
+
+# function create_role_rc_j2() {
+#     if [ "$#" != "3" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <CONFIGURATION_MANAGEMENT_TOP_DIR> <ROLE> <J2_FILE>"
+#     else
+#         log_m "${FUNCNAME[0]} $# ${*}"
+#         # cd "${TOP_DIR:?}" || exit 1
+#         mkdir -p ${1}/${2}
+
+#         local APP_NAME=myapp
+#         local APP_VERSION=v0.0.1
+#         local APP_ENABLE=true
+
+#         # j2_enable=true
+#         set_j2_template_file \
+#             "infile:${TOP_DIR:?}/data/templates/${J2_FILE}" \
+#             "outfile:${1}/${2}/${2}_rc.sh" \
+#             "APP_NAME:${APP_NAME}" \
+#             "APP_VERSION:${APP_VERSION}" \
+#             "APP_ENABLE:${APP_ENABLE}"
+#     fi
+# }
+
+# function create_conf() {
+#     if [ "$#" != "2" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <CONFIGURATION_MANAGEMENT_TOP_DIR> <ROLE>"
+#     else
+#         log_m "${FUNCNAME[0]} $# ${*}"
+#         # cd "${TOP_DIR:?}" || exit 1
+#         mkdir -p ${1}/${2}/rootfs/etc/${2}
+#         cat <<\*EOF* >"${1}/${2}/rootfs/etc/${2}/${2}.conf"
+# *EOF*
+#     fi
+# }
+
+# function create_conf_j2() {
+#     if [ "$#" != "3" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <CONFIGURATION_MANAGEMENT_TOP_DIR> <ROLE> <J2_FILE>"
+#     else
+#         log_m "${FUNCNAME[0]} $# ${*}"
+#         # cd "${TOP_DIR:?}" || exit 1
+#         mkdir -p ${1}/${2}
+
+#         local APP_NAME=myapp
+#         local APP_VERSION=v0.0.1
+#         local APP_ENABLE=true
+
+#         # j2_enable=true
+#         set_j2_template_file \
+#             "infile:${TOP_DIR:?}/data/templates/${J2_FILE}" \
+#             "outfile:${1}/${2}/rootfs/etc/${2}/${2}.conf" \
+#             "APP_NAME:${APP_NAME}" \
+#             "APP_VERSION:${APP_VERSION}" \
+#             "APP_ENABLE:${APP_ENABLE}"
+#     fi
+# }
+
+# function create_script_{{ RUNTIME }}_{{ FUNCNAME }}() { # [ daemon | docker ] [ install_app | deploy_app ]
+#     if [ "$#" != "4" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <CONFIGURATION_MANAGEMENT_TOP_DIR> <ROLE> <RUNTIME> <SCRIPT>"
+#     else
+#         log_m "${FUNCNAME[0]} $# ${*}"
+#         # cd "${TOP_DIR:?}" || exit 1
+#         mkdir -p "${1}/${2}/${3}"
+#         cat <<\*EOF* >"${1}/${2}/${3}/${4}"
+# #!/usr/bin/env bash
+# # set -x
+# echo -e "\n>>> Load Configuration...\n"
+# BIN_DIR=$(cd "$(dirname "${0}")" && pwd)
+# echo ">>> BIN_DIR=${BIN_DIR}"
+# TOP_DIR=$(dirname ${BIN_DIR})
+# echo ">>> TOP_DIR=${TOP_DIR}"
+# ROOTFS_DIR=${TOP_DIR:?}/rootfs
+# echo ">>> ROOTFS_DIR=${ROOTFS_DIR}"
+# ROLE=$(basename ${TOP_DIR:?})
+# echo ">>> ROLE=${ROLE}"
+# # source "${HOME}/.my_libs/bash/myconfigs"
+# # source "${HOME}/.my_libs/bash/mylib"
+# # source "${HOME}/.my_libs/bash/myprojects"
+# # source ${TOP_DIR:?}/${ROLE}_rc.sh
+# # if [ "$#" != "1" ]; then
+# #     log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+# #     exit 0
+# # fi
+# # sudo cp ${ROOTFS_DIR}/etc/${ROLE}/${ROLE}.conf /etc/${ROLE}/${ROLE}.conf
+# PACKAGE_MANAGER=$(basename $(command -v {apt-get,brew,dnf,emerge,pacman,yum,zypper,xbps-install} 2>/dev/null) 2>/dev/null || basename $(command -v apk 2>/dev/null) 2>/dev/null)
+# PACKAGE_SYSTEM=$(basename $(command -v {dpkg,pkgbuild,rpm} 2>/dev/null) 2>/dev/null || basename $(command -v apk 2>/dev/null) 2>/dev/null)
+# DISTRO=$(cat /etc/*-release 2>/dev/null | uniq -u | grep ^ID= | cut -d = -f 2 | sed s/\"//g | sed s/linux/-linux/g && sw_vers -productName 2>/dev/null | sed 's/ //g' | tr A-Z a-z)
+# OS=$(uname -s | tr A-Z a-z)
+# ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
+# echo -e "\n>>> ${PACKAGE_MANAGER} ${PACKAGE_SYSTEM} ${DISTRO} ${OS} ${ARCH}....\n"
+# echo -e "\n================================================================================\n"
+# *EOF*
+#     fi
+# }
+
+# function create_script_{{ RUNTIME }}_{{ FUNCNAME }}_j2() { # [ daemon | docker ] [ install_app | deploy_app ]
+#     if [ "$#" != "5" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <CONFIGURATION_MANAGEMENT_TOP_DIR> <ROLE> <RUNTIME> <SCRIPT> <J2_FILE>"
+#     else
+#         log_m "${FUNCNAME[0]} $# ${*}"
+#         # cd "${TOP_DIR:?}" || exit 1
+#         mkdir -p "${1}/${2}/${3}"
+
+#         local APP_NAME=myapp
+#         local APP_VERSION=v0.0.1
+#         local APP_ENABLE=true
+
+#         # j2_enable=true
+#         set_j2_template_file \
+#             "infile:${TOP_DIR:?}/data/templates/${J2_FILE}" \
+#             "outfile:${1}/${2}/${3}/${4}" \
+#             "APP_NAME:${APP_NAME}" \
+#             "APP_VERSION:${APP_VERSION}" \
+#             "APP_ENABLE:${APP_ENABLE}"
+#     fi
+# }
+
+# function create_and_run_remote_script() {  # [ daemon | docker ] [ install_app | deploy_app ]
+#     if [ "$#" != "0" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <DEPLOYMENT_PLATFORM_DISTRO_TOP_DIR> <SSH_USER> <IPS> <CONFIGURATION_MANAGEMENT_TOP_DIR> <REMOTE_CONFIGURATION_MANAGEMENT_TOP_DIR> <ROLE> <RUNTIME> <SCRIPT> <ARGS>"
+#     else
+#         log_m "${FUNCNAME[0]}" # ${*}
+#         cd "${CONFIGURATION_MANAGEMENT_TOP_DIR}" || exit 1
+#         ROLE="all" # server client master worker helloworld all
+#         SCRIPT="myscript.sh" # ${FUNCNAME[0]}.sh | install_app.sh | install_server.sh | install_client.sh
+#         create_script_${RUNTIME}_${FUNCNAME[0]} "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}"
+#         # scp_all_scripts_to_remote "${SSH_USER}" "${IPS}"
+#         update_remote_script "${SSH_USER}" "${IPS}" "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${REMOTE_CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}"
+#         run_remote_script "${SSH_USER}" "${IPS}" "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${REMOTE_CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}" "${ARGS}"
+#     fi
+# }
+
+# function create_and_run_remote_script_j2() {  # [ daemon | docker ] [ install_app | deploy_app ]
+#     if [ "$#" != "0" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <DEPLOYMENT_PLATFORM_DISTRO_TOP_DIR> <SSH_USER> <IPS> <CONFIGURATION_MANAGEMENT_TOP_DIR> <REMOTE_CONFIGURATION_MANAGEMENT_TOP_DIR> <ROLE> <RUNTIME> <SCRIPT> <ARGS>"
+#     else
+#         log_m "${FUNCNAME[0]}" # ${*}
+#         cd "${CONFIGURATION_MANAGEMENT_TOP_DIR}" || exit 1
+#         ROLE="all" # server client master worker helloworld all
+#         J2_FILE="myscript.sh.2" # ${FUNCNAME[0]}.sh | install_app.sh | install_server.sh | install_client.sh.j2 | install_app.sh.j2 | install_server.sh.j2 | install_client.sh.j2
+#         SCRIPT="myscript.sh" # ${FUNCNAME[0]}.sh | install_app.sh | install_server.sh | install_client.sh
+#         create_script_${RUNTIME}_${FUNCNAME[0]}_j2 "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}" "${J2_FILE}"
+#         # scp_all_scripts_to_remote "${SSH_USER}" "${IPS}"
+#         update_remote_script "${SSH_USER}" "${IPS}" "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${REMOTE_CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}"
+#         run_remote_script "${SSH_USER}" "${IPS}" "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${REMOTE_CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}" "${ARGS}"
+#     fi
+# }
+
+# function create_script_batch() {
+#     if [ "$#" != "0" ]; then
+#         log_e "Usage: ${FUNCNAME[0]}"
+#     else
+#         log_m "${FUNCNAME[0]}" # ${*}
+#         mkdir -p ${CONFIGURATION_MANAGEMENT_TOP_DIR}
+#         cd "${CONFIGURATION_MANAGEMENT_TOP_DIR}" || exit 1
+#         ROLE="all" # server client master worker helloworld all
+#         SCRIPT="myscript.sh" # ${FUNCNAME[0]}.sh | install_app.sh | install_server.sh | install_client.sh
+#         create_role_rc "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}"
+#         # source ${CONFIGURATION_MANAGEMENT_TOP_DIR}/${ROLE}/${ROLE}_rc.sh
+#         create_conf "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}"
+#         RUNTIME=container
+#         create_script_${RUNTIME}_${FUNCNAME[0]} "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}"
+#         RUNTIME=daemon
+#         create_script_${RUNTIME}_${FUNCNAME[0]} "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}"
+#     fi
+# }
+
+# function create_script_batch_j2() {
+#     if [ "$#" != "0" ]; then
+#         log_e "Usage: ${FUNCNAME[0]}"
+#     else
+#         log_m "${FUNCNAME[0]}" # ${*}
+#         mkdir -p ${CONFIGURATION_MANAGEMENT_TOP_DIR}
+#         cd "${CONFIGURATION_MANAGEMENT_TOP_DIR}" || exit 1
+#         ROLE="all" # server client master worker helloworld all
+#         SCRIPT="myscript.sh" # ${FUNCNAME[0]}.sh | install_app.sh | install_server.sh | install_client.sh
+#         create_role_rc "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}"
+#         # source ${CONFIGURATION_MANAGEMENT_TOP_DIR}/${ROLE}/${ROLE}_rc.sh
+#         create_conf "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}"
+#         RUNTIME=container
+#         create_script_${RUNTIME}_${FUNCNAME[0]}_j2 "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}"
+#         RUNTIME=daemon
+#         create_script_${RUNTIME}_${FUNCNAME[0]}_j2 "${CONFIGURATION_MANAGEMENT_TOP_DIR}" "${ROLE}" "${RUNTIME}" "${SCRIPT}"
+#     fi
+# }
+
+#******************************************************************************
+
 function check_if_root_user() {
     if [[ ${UID} -ne 0 ]]; then
         echo "[Warning] This script was designed for root user.  Please rerun the script as root user!"
         exit 1
+    fi
+}
+
+function run_as_root() {
+    local COMMAND="$*"
+    if [ ${EUID} -ne 0 -a ${USE_SUDO} = "true" ]; then
+        COMMAND="sudo ${COMMAND}"
+    fi
+    ${COMMAND}
+}
+
+function semantic_versioning_parse() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        # log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        MAJOR="${1%%.*}"
+        MINOR="${1#${MAJOR}.}"
+        MINOR="${MINOR%%.*}"
+        PATCH="${1#${MAJOR}.${MINOR}.}"
+        PATCH="${PATCH%%[-.]*}"
+        # echo "${MAJOR} ${MINOR} ${PATCH}"
+    fi
+}
+# semantic_versioning_parse 1.2.3
+
+#******************************************************************************
+
+function is_wsl() {
+    case $(uname -r) in
+        *microsoft*) true ;; # WSL 2
+        *Microsoft*) true ;; # WSL 1
+        *) false ;;
+    esac
+}
+
+function is_darwin() {
+    case $(uname -s | tr A-Z a-z) in
+        darwin) true ;;
+        *) false ;;
+    esac
+}
+
+function get_distribution() {
+    LSB_DIST=""
+    # Every system that we officially support has /etc/os-release
+    if [ -r /etc/os-release ]; then
+        LSB_DIST="$(. /etc/os-release && echo "${ID}")"
+    fi
+    # Returning an empty string here should be alright since the
+    # case statements don't act unless you provide an actual value
+    echo "${LSB_DIST}"
+}
+
+#******************************************************************************
+
+function detect_path_user_group_permission() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <dir/file>"
+        exit 1
+    else
+        if [ -f "${1}" ]; then
+            PATH_TYPE="file"
+        else
+            PATH_TYPE="directory"
+        fi
+        case $(uname -s | tr A-Z a-z) in
+            linux)
+                USER=$(stat -c "%U" "${HOME}")
+                GROUP=$(stat -c "%G" "${HOME}")
+                PERM=$(stat -c "%a" "${HOME}")
+                ;;
+            darwin | freebsd)
+                USER=$(stat -f "%Su" "${HOME}")
+                GROUP=$(stat -f "%Sg" "${HOME}")
+                PERM=$(stat -f "%Lp" "${HOME}")
+                ;;
+        esac
+        echo -e "\n>>> ${1}: ${PATH_TYPE} ${USER} ${GROUP} ${PERM} ...\n"
+    fi
+}
+
+function detect_group_user() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <dir/file>"
+        exit 1
+    else
+        USER_NAME=$(id -n -u)
+        ADMIN_NAME=$(grep '^admin:' /etc/group >&/dev/null && echo admin || echo adm)
+        GROUP_NAME=$(id -n -g)
+        USER_ID=$(id -u)
+        GROUP_ID=$(id -g)
+
+        log_i "USER_NAME=${USER_NAME}"
+        log_i "ADMIN_NAME=${ADMIN_NAME}"
+        log_i "GROUP_NAME=${GROUP_NAME}"
+        log_i "USER_ID=${USER_ID}"
+        log_i "GROUP_ID=${GROUP_ID}"
+    fi
+}
+
+function detect_owner_group_permission() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} [<FILE> | <DIR>]"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        cd "${1}" || exit 1
+
+        detect_env
+        if [ -f "${1}" ]; then
+            DF_TYPE="file"
+
+            case ${OS} in
+                linux)
+                    F_USER=$(stat -c "%U" "${1}")
+                    F_GROUP=$(stat -c "%G" "${1}")
+                    F_PERM=$(stat -c "%a" "${1}")
+                    ;;
+                darwin | freebsd)
+                    F_USER=$(stat -f "%Su" "${1}")
+                    F_GROUP=$(stat -f "%Sg" "${1}")
+                    F_PERM=$(stat -f "%Lp" "${1}")
+                    ;;
+            esac
+            D_PATH=$(dirname "${1}")
+            F_NAME=$(basename "${1}")
+        elif [ -d "${1}" ]; then
+            DF_TYPE="directory"
+            D_PATH="${1}"
+        else
+            DF_TYPE="directory"
+            D_PATH=$(dirname "${1}")
+            if [ ! -e "${D_PATH}" ]; then
+                mkdir -p "${D_PATH}"
+            fi
+        fi
+
+        case ${OS} in
+            linux)
+                D_USER=$(stat -c "%U" "${D_PATH}")
+                D_GROUP=$(stat -c "%G" "${D_PATH}")
+                D_PERM=$(stat -c "%a" "${D_PATH}")
+                ;;
+            darwin | freebsd)
+                D_USER=$(stat -f "%Su" "${D_PATH}")
+                D_GROUP=$(stat -f "%Sg" "${D_PATH}")
+                D_PERM=$(stat -f "%Lp" "${D_PATH}")
+                ;;
+        esac
+
+        if [ "${F_USER}" == "" ]; then
+            F_USER="${D_USER}"
+            F_GROUP="${D_GROUP}"
+            F_PERM="${D_PERM}"
+        fi
+
+        log_i "DF_TYPE=${DF_TYPE}"
+        log_i "F_NAME=${F_NAME}"
+        log_i "D_PATH=${D_PATH}"
+        log_i "F_USER=${F_USER}"
+        log_i "F_GROUP=${F_GROUP}"
+        log_i "F_PERM=${F_PERM}"
+        log_i "D_USER=${D_USER}"
+        log_i "D_GROUP=${D_GROUP}"
+        log_i "D_PERM=${D_PERM}"
+    fi
+}
+
+function clean_owner_group_permission() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        cd "${1}" || exit 1
+
+        DF_TYPE=''
+        F_NAME=''
+        D_PATH=''
+        F_USER=''
+        F_GROUP=''
+        F_PERM=''
+        D_USER=''
+        D_GROUP=''
+        D_PERM=''
+    fi
+}
+
+function defrag_disk() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        cd "${1}" || exit 1
+
+        # time e4defrag "${1}"
+        time sudo e4defrag "${1}"
+    fi
+}
+
+function free_space() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        cd "${1}" || exit 1
+
+        time cat /dev/zero >zero.fill
+        sync
+        sleep 1
+        sync
+        rm zero.fill
+    fi
+}
+
+#******************************************************************************
+
+function update_datetime() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        # log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        echo -e "\n>>> Time Sync...\n"
+        sudo date -s "$(curl -s --head http://google.com | grep ^Date: | sed 's/Date: //g') ${1}"
     fi
 }
 
@@ -44,10 +558,10 @@ function read_and_confirm_password() {
 
     if [ "${2}" == "PASSWORD" ] && [ "${PASSWORD}" == "" ]; then
 
-        echo -e "\n>> Please enter password: "
+        echo -e "\n>>> Please enter password: "
         read -r -s -p "Password: " PASSWORD_01
 
-        echo -e "\n>> Please enter password: "
+        echo -e "\n>>> Please enter password: "
         read -r -s -p "Password: " PASSWORD_02
 
         if [ "${PASSWORD_01}" == "${PASSWORD_02}" ]; then
@@ -69,27 +583,27 @@ function read_and_confirm() {
     fi
 
     while [ "${REASON}" == "" ]; do
-        echo -e "\n>> Please enter ${1}: "
+        echo -e "\n>>> Please enter ${1}: "
         read -r REASON
 
         local INPUT=0
         while [ ${INPUT} -le 0 ] || [ ${INPUT} -ge 3 ]; do
-            echo -e "\n>> Please confirm: ${REASON}"
+            echo -e "\n>>> Please confirm: ${REASON}"
             echo " 1) Yes"
             echo " 2) No"
-            echo -e "\n>> Please enter your choice:"
+            echo -e "\n>>> Please enter your choice:"
             read -r INPUT
             #echo "Your INPUT is ${INPUT}"
             case ${INPUT} in
-            1) ;;
+                1) ;;
 
-            2)
-                REASON=""
-                ;;
-            *)
-                log_e "Invalid INPUT: ${INPUT}"
-                INPUT=0
-                ;;
+                2)
+                    REASON=""
+                    ;;
+                *)
+                    log_e "Invalid INPUT: ${INPUT}"
+                    INPUT=0
+                    ;;
             esac
         done
     done
@@ -125,28 +639,28 @@ function read_multiple_line_and_confirm() {
 
     while [ "${REASON}" == "" ]; do
 
-        echo -e "\n>> Please enter ${1}: "
+        echo -e "\n>>> Please enter ${1}: "
         echo "******************************************************************************"
         read_multiple_line REASON
 
         local INPUT=0
         while [ ${INPUT} -le 0 ] || [ ${INPUT} -ge 3 ]; do
-            echo -e "\n>> Please confirm: ${REASON}"
+            echo -e "\n>>> Please confirm: ${REASON}"
             echo " 1) Yes"
             echo " 2) No"
-            echo -e "\n>> Please enter your choice:"
+            echo -e "\n>>> Please enter your choice:"
             read -r INPUT
             #echo "Your INPUT is ${INPUT}"
             case ${INPUT} in
-            1) ;;
+                1) ;;
 
-            2)
-                REASON=""
-                ;;
-            *)
-                log_e "Invalid INPUT: ${INPUT}"
-                INPUT=0
-                ;;
+                2)
+                    REASON=""
+                    ;;
+                *)
+                    log_e "Invalid INPUT: ${INPUT}"
+                    INPUT=0
+                    ;;
             esac
         done
     done
@@ -163,30 +677,30 @@ function enter_file_name() {
     fi
 
     while [ "${REASON}" == "" ]; do
-        echo "\nList existing file in ${1}...\n"
+        echo -e "\nList existing file in ${1}...\n"
         ls "${1}"
 
-        echo -e "\n>> Please enter ${2}: "
+        echo -e "\n>>> Please enter ${2}: "
         read -r REASON
 
         local INPUT=0
         while [ ${INPUT} -le 0 ] || [ ${INPUT} -ge 3 ]; do
-            echo -e "\n>> Please confirm: ${REASON}"
+            echo -e "\n>>> Please confirm: ${REASON}"
             echo " 1) Yes"
             echo " 2) No"
-            echo -e "\n>> Please enter your choice:"
+            echo -e "\n>>> Please enter your choice:"
             read -r INPUT
             #echo "Your INPUT is ${INPUT}"
             case ${INPUT} in
-            1) ;;
+                1) ;;
 
-            2)
-                REASON=""
-                ;;
-            *)
-                log_e "Invalid INPUT: ${INPUT}"
-                INPUT=0
-                ;;
+                2)
+                    REASON=""
+                    ;;
+                *)
+                    log_e "Invalid INPUT: ${INPUT}"
+                    INPUT=0
+                    ;;
             esac
         done
     done
@@ -205,10 +719,10 @@ function confirm_yn() {
     local SIZE=3
     while [ "${INPUT}" -le 0 ] || [ "${INPUT}" -ge "${SIZE}" ]; do
         if [ "${OPT}" == "" ] || [ "${OPT}" -le 0 ] || [ "${OPT}" -ge "${SIZE}" ]; then
-            echo -e "\n>> ${1}:"
+            echo -e "\n>>> ${1}:"
             echo " 1) Yes"
             echo " 2) No"
-            echo -e "\n>> Please enter your choice:"
+            echo -e "\n>>> Please enter your choice:"
             read -r INPUT
             #echo "Your INPUT is ${INPUT}"
         elif [ "${OPT}" -gt 0 ] || [ "${OPT}" -lt "${SIZE}" ]; then
@@ -216,16 +730,16 @@ function confirm_yn() {
         fi
 
         case ${INPUT} in
-        1)
-            ENABLE="yes"
-            ;;
-        2)
-            ENABLE="no"
-            ;;
-        *)
-            log_e "Invalid INPUT: ${INPUT}"
-            INPUT=0
-            ;;
+            1)
+                ENABLE="yes"
+                ;;
+            2)
+                ENABLE="no"
+                ;;
+            *)
+                log_e "Invalid INPUT: ${INPUT}"
+                INPUT=0
+                ;;
         esac
     done
     eval ${2}="'${ENABLE}'"
@@ -243,10 +757,10 @@ function confirm_tf() {
     local SIZE=3
     while [ "${INPUT}" -le 0 ] || [ "${INPUT}" -ge "${SIZE}" ]; do
         if [ "${OPT}" == "" ] || [ "${OPT}" -le 0 ] || [ "${OPT}" -ge "${SIZE}" ]; then
-            echo -e "\n>> ${1}:"
+            echo -e "\n>>> ${1}:"
             echo " 1) True"
             echo " 2) False"
-            echo -e "\n>> Please enter your choice:"
+            echo -e "\n>>> Please enter your choice:"
             read -r INPUT
             #echo "Your INPUT is ${INPUT}"
         elif [ "${OPT}" -gt 0 ] || [ "${OPT}" -lt "${SIZE}" ]; then
@@ -254,16 +768,16 @@ function confirm_tf() {
         fi
 
         case ${INPUT} in
-        1)
-            ENABLE="true"
-            ;;
-        2)
-            ENABLE="false"
-            ;;
-        *)
-            log_e "Invalid INPUT: ${INPUT}"
-            INPUT=0
-            ;;
+            1)
+                ENABLE="true"
+                ;;
+            2)
+                ENABLE="false"
+                ;;
+            *)
+                log_e "Invalid INPUT: ${INPUT}"
+                INPUT=0
+                ;;
         esac
     done
     eval ${2}="'${ENABLE}'"
@@ -283,10 +797,10 @@ function select_x_from_path() {
             log_e "${ROOT_FOLDER} Cannot be found"
             exit 1
         fi
-        cd "${ROOT_FOLDER}" || exit
+        cd "${ROOT_FOLDER}" || exit 1
 
         local OPTIONS=(*)
-        echo -e "\n>> Enter the Number of ${2} to Be Select: "
+        echo -e "\n>>> Enter the Number of ${2} to Be Select: "
         local PS3=">> Please enter your choice: "
         select OPTION in ${OPTIONS[*]}; do
             echo "${REPLY} ${OPTIONS[${REPLY} - 1]}"
@@ -308,7 +822,7 @@ function select_x_from_array() {
 
     if [ "${4}" == "" ]; then
         read -r -a OPTIONS <<<"${1}"
-        echo -e "\n>> Enter the Number of ${2} to Be Select: "
+        echo -e "\n>>> Enter the Number of ${2} to Be Select: "
         local PS3=">> Please enter your choice: "
         select OPTION in ${OPTIONS[*]}; do
             echo "${REPLY} ${OPTIONS[${REPLY} - 1]}"
@@ -330,7 +844,7 @@ function select_x_from_file() {
     if [ "${4}" == "" ]; then
         local OPTIONS=()
         read_option_array_from_configuration_file OPTIONS "${1}"
-        echo -e "\n>> Enter the Number of ${2} to Be Select: "
+        echo -e "\n>>> Enter the Number of ${2} to Be Select: "
         local PS3=">> Please enter your choice: "
         select OPTION in ${OPTIONS[*]}; do
             echo "${REPLY} ${OPTIONS[${REPLY} - 1]}"
@@ -343,6 +857,164 @@ function select_x_from_file() {
 
 #******************************************************************************
 
+function check_and_add_include_in_etc_app_conf() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <APP_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        local APP_NAME=${1}
+        if ! sudo grep -q "include /etc/${APP_NAME}.d/\*.conf" /etc/${APP_NAME}.conf; then
+            echo "Include in '/etc/${APP_NAME}.conf' is not found!"
+            echo -e "\ninclude /etc/${APP_NAME}.d/*.conf" >>/etc/${APP_NAME}.conf
+        else
+            echo "Include in '/etc/${APP_NAME}.conf' found!"
+        fi
+    fi
+}
+
+function print_file_without_comments_and_empty_lines() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <FILE>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        local FILE=${1}
+        grep "^[^#*/;]" ${FILE}
+        # sed -e 's/^[ \t]*//g' -e 's/[ \t]*$//g' -e 's/[ \t]*#.*$//g' -e '/^[ \t]*$/d' ${FILE}
+    fi
+}
+
+function remove_leading_trailing_spaces_comments_and_empty_lines_from_file() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <FILE>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        local FILE=${1}
+        grep "^[^#*/;]" ${FILE} | tee ${FILE}
+        # sed -i -e 's/^[ \t]*//g' -e 's/[ \t]*$//g' -e 's/[ \t]*#.*$//g' -e '/^[ \t]*$/d' ${FILE}
+    fi
+}
+
+#******************************************************************************
+
+# Usage:
+# set_j2_template_file \
+#     "infile:${TOP_DIR:?}/data/template/app.conf.j2" \
+#     "outfile:${TOP_DIR:?}/data/rootfs/etc/app.conf" \
+#     "APP_NAME:${APP_NAME}" \
+#     "APP_VERSION:${APP_VERSION}" \
+#     "APP_ENABLE:${APP_ENABLE}"
+function set_j2_template_file() {
+    if [[ $# < 2 ]]; then
+        log_e "Usage: ${FUNCNAME[0]} \"infile:${TOP_DIR:?}/conf/${SERVICE_HOME}.conf\" [\"outfile:${SERVICE_HOME}/etc/${SERVICE_HOME}.config\"] \"<VARIABLE>:${VARIABLE}\""
+        exit 1
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        local INDEX=1
+        local PARAMETERS=()
+        local J2_ENABLE=true
+        for ELEMENT in "$@"; do
+            IFS=':', read -ra ARRAY <<<"${ELEMENT}"
+            if [[ "${ARRAY[0]}" = "infile" ]]; then
+                local INPUT_FILE=${ARRAY[1]}
+                continue
+            elif [[ "${ARRAY[0]}" = "outfile" ]]; then
+                local OUTPUT_FILE=${ARRAY[1]}
+                continue
+            elif [[ "${ARRAY[0]}" = "j2_enable" ]]; then
+                J2_ENABLE=${ARRAY[1]}
+                continue
+            fi
+            if [ ${J2_ENABLE} == true ]; then
+                PARAMETERS[${INDEX}]="-e 's#{{ ${ARRAY[0]} }}#${ARRAY[1]}#g' "
+            else
+                PARAMETERS[${INDEX}]="-e 's#${ARRAY[0]}#${ARRAY[1]}#g' "
+            fi
+            PARAMETERS+=${PARAMETERS[${INDEX}]}
+            i=$((${INDEX} + 1))
+        done
+        if [[ "${OUTPUT_FILE}" ]]; then
+            if [ ! -e "${OUTPUT_FILE}.bak" ] && [ -e "${OUTPUT_FILE}" ]; then
+                cp "${OUTPUT_FILE}" "${OUTPUT_FILE}.bak"
+            fi
+            eval sed ${PARAMETERS} "${INPUT_FILE}" >"${OUTPUT_FILE}"
+        else
+            if [ ! -e "${INPUT_FILE}.bak" ] && [ -e "${INPUT_FILE}" ]; then
+                cp "${INPUT_FILE}" "${INPUT_FILE}.bak"
+            fi
+            eval sed -i ${PARAMETERS} "${INPUT_FILE}"
+        fi
+    fi
+}
+
+# Usage:
+# set_j2_template_files \
+#     "template_dir:${TOP_DIR:?}/data/template" \
+#     "files:${TOP_DIR:?}/data/rootfs/etc/app.conf ${TOP_DIR:?}/data/rootfs/etc/app/default" \
+#     "APP_NAME:${APP_NAME}" \
+#     "APP_VERSION:${APP_VERSION}" \
+#     "APP_ENABLE:${APP_ENABLE}"
+function set_j2_template_files() {
+    if [[ $# < 3 ]]; then
+        log_e "Usage: ${FUNCNAME[0]} \"template_dir=\path\to\template\\\" \"files:${TOP_DIR:?}/conf/${SERVICE_HOME}.conf\" \"<VARIABLE>:${VARIABLE}\""
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        local INDEX=1
+        local PARAMETERS=()
+        local J2_ENABLE=true
+        for ELEMENT in "$@"; do
+            IFS=':', read -ra ARRAY <<<"${ELEMENT}"
+            if [[ "${ARRAY[0]}" = "files" ]]; then
+                local FILES=${ARRAY[1]}
+                continue
+            elif [[ "${ARRAY[0]}" = "template_dir" ]]; then
+                local TEMPLATE_DIR=${ARRAY[1]}
+                continue
+            elif [[ "${ARRAY[0]}" = "j2_enable" ]]; then
+                J2_ENABLE=${ARRAY[1]}
+                continue
+            fi
+            if [ ${J2_ENABLE} == true ]; then
+                PARAMETERS[${INDEX}]="-e 's#{{ ${ARRAY[0]} }}#${ARRAY[1]}#g' "
+            else
+                PARAMETERS[${INDEX}]="-e 's#${ARRAY[0]}#${ARRAY[1]}#g' "
+            fi
+            # PARAMETERS[${INDEX}]="-e 's#${ARRAY[0]}#${ARRAY[1]}#g' "
+            PARAMETERS+=${PARAMETERS[${INDEX}]}
+            i=$((${INDEX} + 1))
+        done
+
+        for FILE in ${FILES[*]}; do
+            if [ ! -e "$(dirname ${FILE})" ]; then
+                mkdir -p "$(dirname ${FILE})"
+            fi
+            if [ ! -e "${FILE}.bak" ] && [ -e "${FILE}" ]; then
+                cp "${FILE}" "${FILE}.bak"
+            fi
+            eval sed ${PARAMETERS} ${TEMPLATE_DIR}/$(basename ${FILE}).j2 >${FILE}
+            if [ ${FILE: -3} == ".sh" ]; then
+                chmod +x "${FILE}"
+            fi
+        done
+    fi
+}
+
+#******************************************************************************
+
 # read option from a configuration file
 function read_option_array_from_configuration_file() {
     if [ "$#" != "2" ]; then
@@ -350,7 +1022,7 @@ function read_option_array_from_configuration_file() {
         exit 1
     else
         i=0
-        while read -r LINE; do # Read a line
+        while read -r LINE; do       # Read a line
             eval ${1}[i]="'${LINE}'" # Put it into the array
             i=$((${i} + 1))
         done <"${2}"
@@ -408,8 +1080,8 @@ function remove_pattern_in_string() {
 #******************************************************************************
 # https://scottlinux.com/2012/09/01/encode-or-decode-base64-from-the-command-line/
 # [ROT13](https://en.wikipedia.org/wiki/ROT13)
-# [](https://www.linuxquestions.org/questions/linux-software-2/hiding-passwords-in-bash-scirpts-4175576896/page2.html)
-# [hiding passwords in bash scirpts](https://paragonie.com/blog/2015/08/you-wouldnt-base64-a-password-cryptography-decoded#encoding-compression)
+# [](https://www.linuxquestions.org/questions/linux-software-2/hiding-passwords-in-bash-scripts-4175576896/page2.html)
+# [hiding passwords in bash scripts](https://paragonie.com/blog/2015/08/you-wouldnt-base64-a-password-cryptography-decoded#encoding-compression)
 
 function encode_data() {
     if [ "$#" != "1" ]; then
@@ -454,6 +1126,36 @@ function decrypt_data() {
 
 #******************************************************************************
 
+# https://regex101.com/
+# https://regexr.com/
+# https://linuxize.com/post/how-to-compare-strings-in-bash/
+function check_if_input_match_regular_expression() { # Not Working
+    if [ "$#" != "1" ] && [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS> [<REG_EXPR>]"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        # log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "1" ]; then
+            local INPUT="${1}"
+            local REGULAR_EXPRESSION='^[a-z0-9]([-a-z0-9]*[a-z0-9])?'
+        else
+            local INPUT="${1}"
+            local REGULAR_EXPRESSION="${2}"
+        fi
+        if [ "$(echo ${INPUT} | grep -o -E '^[a-z0-9]([-a-z0-9]*[a-z0-9])?')" == "${INPUT}" ]; then
+            echo "Match regular expression!"
+            return 0
+        else
+            echo "Do not match regular expression!"
+            return 1
+        fi
+    fi
+}
+
+#******************************************************************************
+
 function find_and_delete_file() {
     if [ "$#" != "2" ]; then
         log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <REG_EXPR>"
@@ -461,11 +1163,11 @@ function find_and_delete_file() {
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] Delete ${2} at ${1}"
 
-        cd "${1}" || exit
+        cd "${1}" || exit 1
         # time sudo find "${1}" -type f -iname "${2}" -print -delete
 
         time sudo find "${1}" \
-            -type d -iname 'Library' -prune -o \
+            -type d -iname 'library' -prune -o \
             -type f -iname "${2}" -print -delete
     fi
 }
@@ -477,7 +1179,7 @@ function find_and_delete_directory() {
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] Delete ${2} at ${1}"
 
-        cd "${1}" || exit
+        cd "${1}" || exit 1
         # time sudo find "${1}" -type d -iname "${2}"-print -delete
         time sudo find "${1}" -type d -iname "${2}" -exec rm -rf {} \;
 
@@ -493,8 +1195,24 @@ function find_directory_x_and_delete_file_y() {
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] Delete ${3} at ${1}"
 
-        cd "${1}" || exit
+        cd "${1}" || exit 1
         sudo find "${1}" -type d -iname "${2}" -exec sudo find "{}" -type f -iname "${3}" -print -delete \;
+    fi
+}
+
+function find_and_rename_directory() {
+    if [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR> <MATCH_PATTERN> <REPLACE_PATTERN>"
+        exit 1
+    elif [ -e "${1}" ]; then
+        log_i "[${FUNCNAME[0]}] Delete ${2} at ${1}"
+
+        cd "${1}" || exit 1
+        time find "${1}" -type d -name "${2}" -exec bash -c 'mv {} $(dirname {})'/${3} {} \;
+        # time find "${1}" -type d -name "${2}" -exec bash -c 'mv {}/* $(dirname {})'/${3} {} \;
+
+        # time find . -type d -name cd -exec bash -c 'mv {}/* $(dirname {})/src' {} \;
+        # time find . -type d -name ci -exec bash -c 'mv {}/* $(dirname {})/src' {} \;
     fi
 }
 
@@ -505,8 +1223,8 @@ function find_type_and_chmod() {
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] chmod ${2} at ${1}"
 
-        # cd "${1}" || exit
-        time sudo find find "${1}" -type "${2}" -exec chmod ${3} "{}" \;
+        # cd "${1}" || exit 1
+        time sudo find "${1}" -type "${2}" -exec chmod ${3} "{}" \;
     fi
 }
 
@@ -517,7 +1235,7 @@ function find_and_chmod() {
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] chmod ${2} at ${1}"
 
-        cd "${1}" || exit
+        cd "${1}" || exit 1
         time sudo find "${1}" -name "${2}" -exec chmod ${3} "{}" \;
     fi
 }
@@ -529,8 +1247,8 @@ function find_type_and_chown() {
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] chown ${2} at ${1}"
 
-        # cd "${1}" || exit
-        time sudo find find "${1}" -type "${2}" -exec chown ${3}:${4} "{}" \;
+        # cd "${1}" || exit 1
+        time sudo find "${1}" -type "${2}" -exec chown ${3}:${4} "{}" \;
     fi
 }
 
@@ -541,21 +1259,36 @@ function find_and_chown() {
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] chown ${2} at ${1}"
 
-        cd "${1}" || exit
+        cd "${1}" || exit 1
         time sudo find "${1}" -name "${2}" -exec chown ${3}:${4} "{}" \;
     fi
 }
 
 #******************************************************************************
 
-find_and_delete_0_size_folder() {
+function count_file_by_extension() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BASE_DIR>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        find "${1}" \
+            -type d -iname '.git*' -prune -o \
+            -type d -iname 'vendor' -prune -o \
+            -type f -exec basename {} \; | sed 's/^.*\.//' | sort | uniq -c | sort -n
+    fi
+}
+
+function find_and_delete_0_size_folder() {
     if [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <BASE_DIR>"
         exit 1
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] Delete Zero Size Folder at ${1}"
 
-        cd "${1}" || exit
+        cd "${1}" || exit 1
         # time sudo find "${1}" -name '.git*' -prune -o -maxdepth 1 -type d -empty -print -delete
         time sudo find "${1}" \
             -name '.git*' -prune -o \
@@ -568,17 +1301,20 @@ find_and_delete_0_size_folder() {
             -type d -iname 'Google Drive' -prune -o \
             -type d -iname 'Library' -prune -o \
             -maxdepth 5 -type d -empty -print -delete
+
+        # find . -type d -name cd -empty -print -delete
+        # find . -type d -name ci -empty -print -delete
     fi
 }
 
-find_and_delete_0_size_file() {
+function find_and_delete_0_size_file() {
     if [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <BASE_DIR>"
         exit 1
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] Delete Zero File at ${1}"
 
-        cd "${1}" || exit
+        cd "${1}" || exit 1
         # time sudo find "${1}" -name '.git*' -prune -o -type f -size 0 -print -exec rm -rf {} \;
         time sudo find "${1}" \
             -name '.git*' -prune -o \
@@ -602,7 +1338,7 @@ function find_file_size_larger_than() {
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] Size larger ${2}MB at ${1}"
 
-        cd "${1}" || exit
+        cd "${1}" || exit 1
         # time sudo find "${1}" -type f -size +${2}M -exec bash -c "echo -e '\n>> {}...'; ls -alh {}; echo;" "{}" \;
         time sudo find "${1}" -type f -size +${2}M -exec bash -c "echo -e '\n>> {}...'; ls -alh {}" "{}" \;
     fi
@@ -615,7 +1351,7 @@ function find_file_size_smaller_than() {
     elif [ -e "${1}" ]; then
         log_i "[${FUNCNAME[0]}] Size larger ${2}MB at ${1}"
 
-        cd "${1}" || exit
+        cd "${1}" || exit 1
         # time sudo find "${1}" -type f -size -${2}M -exec bash -c "echo -e '\n>> {}...'; ls -alh {}; echo;" "{}" \;
         time sudo find "${1}" -type f -size -${2}M -exec bash -c "echo -e '\n>> {}...'; ls -alh {}" "{}" \;
     fi
@@ -646,16 +1382,25 @@ function reformat_file() {
         # Add single white line to end of file
         sed -i -e '$a\' "${1}"
 
-        # if [ "${1}" == "*Makefile" ]; then
-        #     # https://stackoverflow.com/questions/16931770/makefile4-missing-separator-stop
-        #     unexpand -a -t 4 "${1}" > "${1}".tmp; mv "${1}".tmp "${1}";
-        # else
-        #     # Change tab to space of 4
-        #     # https://github.com/wilzbach/shell-tools/blob/master/expandall
-        #     # sed -i 's/^\t/    /g' "${1}"
-        #     # sed -i 's/\t/    /g' "${1}"
-        #     expand -t 4 "${1}" > "${1}".tmp; mv "${1}".tmp "${1}";
-        # fi
+        if [ "$(basename ${1})" == "*Makefile" ]; then
+            # https://stackoverflow.com/questions/16931770/makefile4-missing-separator-stop
+            unexpand -a -t 4 ${1} >${1}.tmp
+            mv ${1}.tmp ${1}
+        elif [ "$(basename ${1})" == "*.go" ]; then
+            # https://stackoverflow.com/questions/16931770/makefile4-missing-separator-stop
+            unexpand -a -t 4 ${1} >${1}.tmp
+            mv ${1}.tmp ${1}
+        elif [ "$(basename ${1})" == "*.bats" ]; then
+            # unexpand -a -t 4 ${1} > ${1}.tmp; mv ${1}.tmp ${1};
+            :
+        else
+            # Change tab to space of 4
+            # https://github.com/wilzbach/shell-tools/blob/master/expandall
+            # sed -i 's/^\t/    /g' "${1}"
+            # sed -i 's/\t/    /g' "${1}"
+            expand -t 4 ${1} >${1}.tmp
+            mv ${1}.tmp ${1}
+        fi
     fi
 }
 
@@ -683,8 +1428,13 @@ function reformat_files_in_dir() {
         if [ "${2}" == "*Makefile" ]; then
             # https://stackoverflow.com/questions/16931770/makefile4-missing-separator-stop
             # find "${1}" -iname "${2}" -type f -print -exec bash -c 'unexpand -a -t 4 {} > {}.tmp; mv {}.tmp {};' {} \;
-            find "${1}" -iname "${2}" -type f -print -exec bash -c 'i="${1}"; unexpand -a -t 4 "${i}" > "${i}".tmp; mv "${i}".tmp "${i}";' {} \;
-        elif [ "${2}" == "*bats" ]; then
+            find "${1}" -iname "${2}" -type f -print -exec bash -c 'unexpand -a -t 4 {} > {}.tmp; mv {}.tmp {};' {} \;
+        elif [ "${2}" == "*.go" ]; then
+            # https://stackoverflow.com/questions/16931770/makefile4-missing-separator-stop
+            # find "${1}" -iname "${2}" -type f -print -exec bash -c 'unexpand -a -t 4 {} > {}.tmp; mv {}.tmp {};' {} \;
+            find "${1}" -iname "${2}" -type f -print -exec bash -c 'unexpand -a -t 4 {} > {}.tmp; mv {}.tmp {};' {} \;
+        elif [ "${2}" == "*.bats" ]; then
+            # find "${1}" -iname "${2}" -type f -print -exec bash -c 'unexpand -a -t 4 {} > {}.tmp; mv {}.tmp {};' {} \;
             :
         else
             # Change tab to space of 4
@@ -692,9 +1442,116 @@ function reformat_files_in_dir() {
             # find "${1}" -iname "${2}" -type f -print -exec sed -i 's/^\t/    /g' {} \;
             # find "${1}" -iname "${2}" -type f -print -exec sed -i 's/\t/    /g' {} \;
             # find "${1}" -iname "${2}" -type f -print -exec bash -c 'expand -t 4 {} > {}.tmp; mv {}.tmp {};' {} \;
-            find "${1}" -iname "${2}" -type f -print -exec bash -c 'i="${1}"; expand -t 4 "${i}" > "${i}".tmp; mv "${i}".tmp "${i}";' {} \;
+            find "${1}" -iname "${2}" -type f -print -exec bash -c 'expand -t 4 {} > {}.tmp; mv {}.tmp {};' {} \;
         fi
 
+    fi
+}
+
+#******************************************************************************
+
+function reformat_files() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_DIRS> <DOT_EXTENSIONS> <NO_DOT_EXTENSIONS>"
+    else
+        log_m "${FUNCNAME[0]}" # ${*}
+
+        local SRC_DIRS="${HOME}/Documents/myProject"
+        local DOT_EXTENSIONS="adoc alias bash bats conf confluence dotfle example feature gitignore go groovy j2 java js json kts ldif md MD prop py rs rst sample scala service sh template tf tfvars ts xml yaml yml"
+        local NO_DOT_EXTENSIONS="Dockerfile Jenkinsfile Makefile Vagrantfile _example _sample _template"
+        if [ "$#" == "1" ] && [ "${1}" != "" ]; then
+            local SRC_DIRS="${1}"
+        fi
+        local SRC_DIR
+        for SRC_DIR in ${SRC_DIRS[*]}; do
+            for EXTENSION in ${DOT_EXTENSIONS[*]}; do
+                reformat_files_in_dir "${SRC_DIR}" "*.${EXTENSION}"
+            done
+
+            for EXTENSION in ${NO_DOT_EXTENSIONS[*]}; do
+                reformat_files_in_dir "${SRC_DIR}" "*${EXTENSION}"
+            done
+        done
+    fi
+}
+
+function chmod_files() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_DIRS> <EXTENSIONS>"
+    else
+        log_m "${FUNCNAME[0]}" # ${*}
+
+        local SRC_DIRS="${HOME}/bin ${HOME}/go/bin ${HOME}/Documents/myProject"
+        local EXTENSIONS="sh py"
+        if [ "$#" == "1" ] && [ "${1}" != "" ]; then
+            local SRC_DIRS="${1}"
+        fi
+        local SRC_DIR
+        for SRC_DIR in ${SRC_DIRS[*]}; do
+            find_type_and_chown "${SRC_DIR}" "d" "${USER}" "${GROUP}"
+            find_type_and_chown "${SRC_DIR}" "f" "${USER}" "${GROUP}"
+            find_type_and_chmod "${SRC_DIR}" "d" "0755"
+            case ${SRC_DIR} in
+                ${HOME}/bin | ${HOME}/go/bin)
+                    find_type_and_chmod "${SRC_DIR}" "f" "0755"
+                    ;;
+                *)
+                    find_type_and_chmod "${SRC_DIR}" "f" "0644"
+                    ;;
+            esac
+            for EXTENSION in ${EXTENSIONS[*]}; do
+                find_and_chmod "${SRC_DIR}" "*.${EXTENSION}" "0755"
+            done
+        done
+    fi
+}
+
+function remove_empty_directories() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_DIRS> <DIRS>"
+    else
+        log_m "${FUNCNAME[0]}" # ${*}
+
+        local SRC_DIRS="${HOME}/Documents/myProject"
+        local DIRS="bin data tmp"
+        if [ "$#" == "1" ] && [ "${1}" != "" ]; then
+            local SRC_DIRS="${1}"
+        fi
+        local SRC_DIR
+        for SRC_DIR in ${SRC_DIRS[*]}; do
+            for DIR in ${DIRS[*]}; do
+                find "${SRC_DIR}" -type d -empty -name ${DIR} -exec rm -rf {} \;
+                find "${SRC_DIR}" -type d -empty -name ${DIR} -exec du -h {} \;
+            done
+        done
+        find "${SRC_DIR}/{Development,Sandbox,Work}" -type d -name inventories -exec sh -c "find {} -type d -empty -delete" {} \;
+    fi
+}
+
+function find_and_delete_patterns_in_directory() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_DIRS> <FILE_PATTERNS> <DIR_PATTERNS>"
+    else
+        log_m "${FUNCNAME[0]}" # ${*}
+
+        local SRC_DIRS="${HOME}/Documents/myProject"
+        local FILE_PATTERNS="*.~ *~ .*.swp .DS_Store ._.DS_Store .Trashes ._.Trashes ._* .TemporaryItems ._TemporaryItems .picasa.ini Thumbs.db .picasaoriginals *.lnk *.url *.bak"
+        local DIR_PATTERNS="__pycahce__ " # ".idea .vscode"
+        if [ "$#" == "1" ] && [ "${1}" != "" ]; then
+            local SRC_DIRS="${1}"
+        fi
+        local SRC_DIR
+        for SRC_DIR in ${SRC_DIRS[*]}; do
+            for FILE in ${FILE_PATTERNS[*]}; do
+                echo "${PASSWORD}" | sudo -S echo ""
+                find_and_delete_file "${SRC_DIR}" "${FILE}"
+            done
+
+            for DIR in ${DIR_PATTERNS[*]}; do
+                echo "${PASSWORD}" | sudo -S echo ""
+                find_and_delete_directory "${SRC_DIR}" "${DIR}"
+            done
+        done
     fi
 }
 
@@ -709,11 +1566,11 @@ function edit_file_in_directory() {
         FILES=$(sudo find "${1}" -maxdepth 1 -iname "${2}" -exec sh -c "basename '{}' | cut -d '.' -f 1 | tr '\n' ' '" \;)
         select_x_from_array "${FILES}" "FILE" FILE
         if [ "$#" == "2" ] || [ ${EDIT} != false ]; then
-            echo -e "\n>> Show ${1}...\n"
-            sudo cat "${1}/${FILE}.$(echo ${2}  | cut -d '.' -f 2)"
+            echo -e "\n>>> Show ${1}...\n"
+            sudo cat "${1}/${FILE}.$(echo ${2} | cut -d '.' -f 2)"
         else
-            echo -e "\n>> Show ${1}...\n"
-            sudo vi "${1}/${FILE}.$(echo ${2}  | cut -d '.' -f 2)"
+            echo -e "\n>>> Show ${1}...\n"
+            sudo vi "${1}/${FILE}.$(echo ${2} | cut -d '.' -f 2)"
         fi
     fi
 }
@@ -723,23 +1580,780 @@ function edit_file_in_directory() {
 function list_files_in() {
     if [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <PATH>"
+        log_e "${FUNCNAME[0]} $# ${*}"
     else
-        log_m "${FUNCNAME[0]} ${*}"
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
 
         if [ ! -e "${1}" ]; then
             exit 1
         fi
 
         cd "${1}" || exit 1
-        CATEGORIES=("*")
+        CATEGORIES=(*)
         select_x_from_array "${CATEGORIES}" "CATEGORY" CATEGORY
-        rm -rf "${TOP_DIR}/lists/${CATEGORY}.txt" || :
+        rm -rf "${TOP_DIR:?}/lists/${CATEGORY}.txt" || :
 
         cd "${1}/${CATEGORY}" || exit 1
-        FILES=("*")
-        for FILE in "${FILES[@]}"
-        do
-            echo "${FILE}" >> "${TOP_DIR}/list/${CATEGORY}.txt"
+        FILES=(*)
+        for FILE in ${FILES[*]}; do
+            echo "${FILE}" >>"${TOP_DIR:?}/list/${CATEGORY}.txt"
         done
     fi
 }
+
+#******************************************************************************
+# SSH
+
+function export_locale() {
+    export LC_ALL=en_US.UTF-8
+    export LANG=en_US.UTF-8
+}
+
+function check_if_server_available() {
+    if [ "$#" != "2" ] && [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SSH_USER> <IP/FQDN> [<SSH_USER_PASSWORD> | <SSH_USER_PEM>]"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "${SSH_USER_PASSWORD}" != "" ]; then
+            check_command_exist sshpass
+            if [[ $? -ne 0 ]]; then
+                echo "sshpass is not available!"
+                return 1
+            fi
+            if sshpass -p "${SSH_USER_PASSWORD}" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ${1}@${2} -p 22 exit 0; then
+                echo "Server(${2}) is available!"
+                return 0
+            else
+                echo "Server(${2}) is not available!"
+                return 1
+            fi
+        elif [ "${SSH_USER_PEM}" != "" ] && [ -e "${SSH_USER_PEM}" ]; then
+            if ssh -o StrictHostKeyChecking=no -i "${SSH_USER_PEM}" -o ConnectTimeout=5 ${1}@${2} -p 22 exit 0; then
+                echo "Server(${2}) is available!"
+                return 0
+            else
+                echo "Server(${2}) is not available!"
+                return 1
+            fi
+        else
+            if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ${1}@${2} -p 22 exit 0; then
+                echo "Server(${2}) is available!"
+                return 0
+            else
+                echo "Server(${2}) is not available!"
+                return 1
+            fi
+        fi
+    fi
+}
+
+function ssh_copy_id() {
+    if [ "$#" != "2" ] && [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SSH_USER> <IP/FQDN> [<SSH_USER_PASSWORD> | <SSH_USER_PEM>]"
+        exit 1
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "${SSH_USER_PASSWORD}" != "" ]; then
+            check_command_exist sshpass
+            if [[ $? -ne 0 ]]; then
+                echo "sshpass is not available!"
+                return 1
+            fi
+            sshpass -p "${SSH_USER_PASSWORD}" ssh-copy-id -o StrictHostKeyChecking=no ${1}@${2} -p 22 ${3}
+        elif [ "${SSH_USER_PEM}" != "" ] && [ -e "${SSH_USER_PEM}" ]; then
+            ssh-copy-id -o StrictHostKeyChecking=no -i "${SSH_USER_PEM}" ${1}@${2} -p 22 ${3}
+        else
+            ssh-copy-id -o StrictHostKeyChecking=no ${1}@${2} -p 22 ${3}
+        fi
+    fi
+}
+
+function ssh_cmd() {
+    if [ "$#" != "2" ] && [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SSH_USER> <IP/FQDN> [<CMD>]"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "${SSH_USER_PASSWORD}" != "" ]; then
+            check_command_exist sshpass
+            if [[ $? -ne 0 ]]; then
+                echo "sshpass is not available!"
+                return 1
+            fi
+            sshpass -p "${SSH_USER_PASSWORD}" ssh -o StrictHostKeyChecking=no ${1}@${2} -p 22 ${3}
+        elif [ "${SSH_USER_PEM}" != "" ] && [ -e "${SSH_USER_PEM}" ]; then
+            ssh -o StrictHostKeyChecking=no -i "${SSH_USER_PEM}" ${1}@${2} -p 22 ${3}
+        else
+            ssh -o StrictHostKeyChecking=no ${1}@${2} -p 22 ${3}
+        fi
+    fi
+}
+
+function ssh_x_cmd() {
+    if [ "$#" != "2" ] && [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SSH_USER> <IP/FQDN> [<CMD>]"
+        exit 1
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "${SSH_USER_PASSWORD}" != "" ]; then
+            check_command_exist sshpass
+            if [[ $? -ne 0 ]]; then
+                echo "sshpass is not available!"
+                return 1
+            fi
+            sshpass -p "${SSH_USER_PASSWORD}" ssh -o StrictHostKeyChecking=no -X ${1}@${2} -p 22 ${3}
+        elif [ "${SSH_USER_PEM}" != "" ] && [ -e "${SSH_USER_PEM}" ]; then
+            ssh -o StrictHostKeyChecking=no -i "${SSH_USER_PEM}" -X ${1}@${2} -p 22
+        else
+            ssh -o StrictHostKeyChecking=no -X ${1}@${2} -p 22 ${3}
+        fi
+    fi
+}
+
+function scp_to() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} [<SRC_DIR> <SSH_USER>@<IP/FQDN>:<DEST_DIR>] | [<SSH_USER>@<IP/FQDN>:<SRC_DIR> <DEST_DIR>]"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "${SSH_USER_PASSWORD}" != "" ]; then
+            check_command_exist sshpass
+            if [[ $? -ne 0 ]]; then
+                echo "sshpass is not available!"
+                return 1
+            fi
+            sshpass -p "${SSH_USER_PASSWORD}" scp -o StrictHostKeyChecking=no -rp "${1}" "${2}"
+        elif [ "${SSH_USER_PEM}" != "" ] && [ -e "${SSH_USER_PEM}" ]; then
+            scp -o StrictHostKeyChecking=no -i "${SSH_USER_PEM}" -rp "${1}" "${2}"
+        else
+            scp -o StrictHostKeyChecking=no -rp "${1}" "${2}"
+        fi
+    fi
+}
+
+# https://linuxize.com/post/how-to-exclude-files-and-directories-with-rsync/
+function rsync_to() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} [<SRC_DIR> <DEST_DIR> | local_to_remote: <SRC_DIR> <SSH_USER>@<IP/FQDN>:<DEST_DIR> | remote_to_local: <SSH_USER>@<IP/FQDN>:<SRC_DIR> <DEST_DIR>]"
+        exit 1
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        local DELETE_EXTRA_PARAMETERS="--delete"
+        local EXCLUDE_PARAMETERS="--exclude='.DS_Store' --exclude='*.bak' --exclude='.terraform/' --exclude='packer_cache/'"
+        # local EXCLUDE_PARAMETERS="--exclude='.gitignore' --exclude='.idea/' --exclude='.DS_Store' --exclude='*.bak'"
+        # local EXCLUDE_PARAMETERS="--exclude='.git/' --exclude='.gitignore' --exclude='.idea/' --exclude='.DS_Store' --exclude='*.bak'"
+        # local EXCLUDE_PARAMETERS="--prune-empty-dirs"
+        local RSYNC_PATH= # "--rsync-path='sudo rsync'"
+
+        if [ "${SSH_USER_PASSWORD}" != "" ]; then
+            check_command_exist sshpass
+            if [[ $? -ne 0 ]]; then
+                echo "sshpass is not available!"
+                return 1
+            fi
+            sshpass -p "${SSH_USER_PASSWORD}" rsync -avPce "ssh -o StrictHostKeyChecking=no" ${RSYNC_PATH} ${DELETE_EXTRA_PARAMETERS} ${EXCLUDE_PARAMETERS} "${1}" "${2}"
+        elif [ "${SSH_USER_PEM}" != "" ] && [ -e "${SSH_USER_PEM}" ]; then
+            # rsync -avPce "ssh -o StrictHostKeyChecking=no -i ${SSH_USER_PEM}" --rsync-path="sudo rsync" ${RSYNC_PATH} ${DELETE_EXTRA_PARAMETERS} ${EXCLUDE_PARAMETERS} "${1}" "${2}"
+            rsync -avPce "ssh -o StrictHostKeyChecking=no -i ${SSH_USER_PEM}" ${RSYNC_PATH} ${DELETE_EXTRA_PARAMETERS} ${EXCLUDE_PARAMETERS} "${1}" "${2}"
+        else
+            # rsync -avPce "ssh -o StrictHostKeyChecking=no" --rsync-path="sudo rsync" ${RSYNC_PATH} ${DELETE_EXTRA_PARAMETERS} ${EXCLUDE_PARAMETERS} "${1}" "${2}"
+            rsync -avPce "ssh -o StrictHostKeyChecking=no" ${RSYNC_PATH} ${DELETE_EXTRA_PARAMETERS} ${EXCLUDE_PARAMETERS} "${1}" "${2}"
+        fi
+    fi
+}
+
+function rclone_to() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} [local_to_cloud: <SRC_DIR>/<SYNC_FOLDER_NAME> <CLOUD_DRIVE_NAME>:<SYNC_FOLDER_NAME> | cloud_to_local: <CLOUD_DRIVE_NAME>:<SYNC_FOLDER_NAME> <CLOUD_REPLICA_PATH}>/<SYNC_FOLDER_NAME>]"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        local RCLONE_PARAMETERS="--progress --create-empty-src-dirs --fast-list --transfers=40 --checkers=40 --tpslimit=10 --drive-chunk-size=1M --max-backlog 200000 --verbose"
+
+        rclone sync "${1}" "${2}" ${RCLONE_PARAMETERS}
+    fi
+}
+
+# https://www.itread01.com/content/1547304242.html
+function disable_sshd_use_dns() {
+    if [ "$#" != "0" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        sudo sed -i 's/#GSSAPIAuthentication no/GSSAPIAuthentication no/g' /etc/ssh/sshd_config
+        sudo grep GSSAPIAuthentication /etc/ssh/sshd_config
+        sudo sed -i 's/#UseDNS no/UseDNS no/g' /etc/ssh/sshd_config
+        sudo sed -i 's/#UseDNS yes/UseDNS no/g' /etc/ssh/sshd_config
+        sudo grep UseDNS /etc/ssh/sshd_config
+        sudo systemctl restart sshd
+    fi
+}
+
+function allow_tcp_forwarding() {
+    if [ "$#" != "0" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        sudo sed -i 's/#AllowTcpForwarding yes/AllowTcpForwarding yes/g' /etc/ssh/sshd_config
+        sudo grep -rnis AllowTcpForwarding /etc/ssh/sshd_config
+        sudo systemctl restart sshd
+    fi
+}
+
+#******************************************************************************
+# - https://stackoverflow.com/questions/2312762/compare-difference-of-two-arrays-in-bash
+
+function array_sort() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <Array_1>"
+        log_m "${FUNCNAME[0]} ${1}"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        # log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        # Matched Elements
+        ARRAY=($(echo ${1} | tr ' ' '\n' | sort -n | tr '\n' ' '))
+        echo ${ARRAY[@]}
+    fi
+}
+
+function string_pattern_match() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <PATTERN> <INPUT_STRING>"
+        exit 1
+    else
+        echo "${2}" | grep -q -E -e "${1}"
+    fi
+}
+
+function array_match() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <Array_1> <Array_2>"
+        log_m "${FUNCNAME[0]} ${1}"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        # log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        # Matched Elements
+        ARRAY=($(echo ${1} ${2} | tr ' ' '\n' | sort | uniq -D | uniq))
+        echo ${ARRAY[@]}
+    fi
+}
+
+function array_diff() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <Array_1> <Array_2>"
+        log_m "${FUNCNAME[0]} ${1}"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        # log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        # Different Elements
+        ARRAY=($(echo ${1} ${2} | tr ' ' '\n' | sort | uniq -u))
+        echo ${ARRAY[@]}
+    fi
+}
+
+# StringArray1="key1 key2 key3 key4 key5 key6 key7 key8 key9 key10"
+# StringArray2="key1 key3 key5 key7 key9 key10"
+# result1=`array_match "${StringArray1}" "${StringArray2}"`
+# echo ${result1}
+# result2=`array_diff "${StringArray1}" "${StringArray2}"`
+# echo ${result2}
+
+#******************************************************************************
+
+function seperate_file_to_multiple_files_by_separator() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <PATTERN> <FILE>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        # log_m "${FUNCNAME[0]} $# ${*}"
+        cd "$(dirname ${2})" || exit 1
+        awk -v RS="${1}" '{ outfile="outfile_" NR ".yaml"; print > outfile}' ${2}
+    fi
+}
+# seperate_file_to_multiple_files_by_separator "---" "${HOME}/Documents/myProject/Work/kubevirt/src/bash/bash_helm3_kubevirt_operator/data/kubevirt-operator/kubevirt-operator-deployment.yaml"
+
+#******************************************************************************
+
+function create_user() {
+    if [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <user_name> <password> <home_dir>"
+        exit 1
+    elif id -u ${1} >/dev/null 2>&1; then
+        echo "user ${1} exists"
+    else
+        log_m "Add User ${1}"
+
+        sudo useradd -m ${1} -s /bin/bash -d ${3}/${1}
+        (
+            echo ${2}
+            echo ${2}
+        ) | sudo -S passwd ${1}
+
+        if grep -q "^adm:" /etc/group; then
+            sudo adduser ${1} adm || :
+        fi
+
+        if grep -q "^sudo:" /etc/group; then
+            sudo adduser ${1} sudo || :
+        fi
+
+        if grep -q "^wheel:" /etc/group; then
+            sudo adduser ${1} wheel || :
+        fi
+
+        sudo -u ${1} mkdir ${3}/${1}/bin
+        sudo chmod 775 ${3}/${1}/bin
+
+        #ls -alh ${3}/${1}
+    fi
+}
+
+function delete_user() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <user_name>"
+        exit 1
+    else
+        log_m "Delete User ${1}"
+
+        sudo userdel -rf ${1}
+        #sudo delgroup ${1}
+    fi
+}
+
+#******************************************************************************
+
+function generate_ssh_key() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <USER_NAME> <USER_EMAIL> <SSH_KEY>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        sudo -S -H -u "${1}" bash -c "ssh-keygen -t rsa -C ${2} -f ${3} -P ''"
+    fi
+}
+
+function remove_known_hosts() {
+    if [ "$#" != "0" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ -e "${HOME}/.ssh/known_hosts" ]; then
+            sudo rm -f "${HOME}/.ssh/known_hosts"
+        fi
+    fi
+}
+
+# http://bodhizazen.net/Tutorials/SSH_keys
+function update_id_rsa_permission() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SSH_KEY_PATH:${HOME}/.ssh>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        detect_path_user_group_permission ${HOME}
+
+        chown -R ${USER}:${GROUP} "${1}/"
+        chmod 700 ${1}
+        if [ ! -e "${1}/config" ]; then
+            touch ${1}/config
+            chown -R ${USER}:${GROUP} ${1}/config
+        fi
+        chmod 644 ${1}/config
+        chmod 600 ${1}/authorized_keys
+        chmod 600 ${1}/id_rsa
+        chmod 644 ${1}/id_rsa.pub
+        if [ ! -e "${1}/known_hosts" ]; then
+            touch ${1}/known_hosts
+            chown -R ${USER}:${GROUP} ${1}/known_hosts
+        fi
+        chmod 644 ${1}/known_hosts
+
+        ls -alh "${1}"
+    fi
+}
+# update_id_rsa_permission ${HOME}/.ssh
+
+#******************************************************************************
+
+# Download a file with either 'curl', 'wget' or 'scp'
+#
+# ${1}: source URL (e.g. http://foo.com, ssh://blah, /some/path)
+# ${2}: target file (/path/filename)
+function copy_files() {
+    if [ "$#" != "2" ] && [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_DIR> <DEST_DIR> [<HOST_PORT>]"
+        exit 1
+    else
+        find_program COMMAND_CURL curl
+        find_program COMMAND_WGET wget
+        find_program COMMAND_SCP scp
+
+        log_i "Copy files from ${1} to ${2}"
+
+        # Is this HTTP, HTTPS or FTP ?
+        # curl <SRC_DIR> -o <DEST_DIR>
+        if string_pattern_match "^(http|https|ftp):.*" "${1}"; then
+
+            detect_owner_group_permission "${2}"
+            local C_TYPE="${DF_TYPE}"
+            if [ "${C_TYPE}" == "file" ]; then
+                sudo -u "${F_USER}" rm "${2}"
+            fi
+            sudo chmod 777 "${D_PATH}"
+            local O_USER="${D_USER}"
+            clean_owner_group_permission
+
+            if [ -n "${COMMAND_CURL}" ]; then
+                time log_a sudo -u "${O_USER}" "${COMMAND_CURL}" -L "${1}" -o "${2}"
+            elif [ -n "${COMMAND_WGET}" ]; then
+                time log_a sudo -u "${O_USER}" "${COMMAND_WGET}" "${1}" -O "${2}"
+            else
+                echo -e "\nPlease install wget or curl on this machine"
+                exit 1
+            fi
+
+            return
+        fi
+
+        # Is this SSH ?
+        # Accept both ssh://<path> or <machine>:<path>
+        # scp -r <user_name>@<ip/fqdn>:<SRC_DIR> <DEST_DIR>
+        if string_pattern_match "^(ssh|[^:]+):.*" "${1}"; then
+            if [ -n "${COMMAND_SCP}" ]; then
+                SCP_SRC=$(echo ${1} | sed -e s%ssh://%%g)
+
+                if [ "${SSH_USER_PASSWORD}" != "" ]; then
+                    time sshpass -p "${SSH_USER_PASSWORD}" "${COMMAND_SCP}" -o StrictHostKeyChecking=no "${SCP_SRC}" "${2}"
+                elif [ "${SSH_USER_PEM}" != "" ] && [ -e "${SSH_USER_PEM}" ]; then
+                    time "${COMMAND_SCP}" -o StrictHostKeyChecking=no -i "${SSH_USER_PEM}" "${SCP_SRC}" "${2}"
+                else
+                    time "${COMMAND_SCP}" -o StrictHostKeyChecking=no "${SCP_SRC}" "${2}"
+                fi
+            else
+                echo -e "\nPlease install scp on this machine"
+                exit 1
+            fi
+            return
+        fi
+
+        # Is this SSH ?
+        # Accept both ssh://<path> or <machine>:<path>
+        # scp -r <SRC_DIR> <user_name>@<ip/fqdn>:<DEST_DIR>
+        if string_pattern_match "^(ssh|[^:]+):.*" "${2}"; then
+            if [ -n "${COMMAND_SCP}" ]; then
+                SCP_DEST=$(echo ${2} | sed -e s%ssh://%%g)
+
+                if [ "${SSH_USER_PASSWORD}" != "" ]; then
+                    time sshpass -p "${SSH_USER_PASSWORD}" "${COMMAND_SCP}" -o StrictHostKeyChecking=no "${1}" "${SCP_DEST}"
+                elif [ "${SSH_USER_PEM}" != "" ] && [ -e "${SSH_USER_PEM}" ]; then
+                    time "${COMMAND_SCP}" -o StrictHostKeyChecking=no -i "${SSH_USER_PEM}" "${1}" "${SCP_DEST}"
+                else
+                    time "${COMMAND_SCP}" -o StrictHostKeyChecking=no "${1}" "${SCP_DEST}"
+                fi
+            else
+                echo -e "\nPlease install scp on this machine"
+                exit 1
+            fi
+            return
+        fi
+
+        # Is this a file copy ?
+        # Accept both file://<path> or /<path>
+        # cp -R <SRC_DIR>/<file> <DEST_DIR>
+        if string_pattern_match "^(file://|/).*" "${1}"; then
+            CP_SRC=$(echo ${1} | sed -e s%^file://%%g)
+
+            detect_owner_group_permission "${CP_SRC}"
+            log_i "TYPE: ${DF_TYPE}"
+            if [ "${DF_TYPE}" == "file" ]; then
+                local I_PERM="${F_PERM}"
+                local I_USER="${F_USER}"
+            else
+                local I_PERM="${D_PERM}"
+                local I_USER="${D_USER}"
+            fi
+            clean_owner_group_permission
+
+            detect_owner_group_permission "${2}"
+            log_i "TYPE: ${DF_TYPE}"
+            if [ "${DF_TYPE}" == "file" ]; then
+                local O_PERM="${F_PERM}"
+                local O_USER="${F_USER}"
+            else
+                local O_PERM="${D_PERM}"
+                local O_USER="${D_USER}"
+            fi
+            clean_owner_group_permission
+
+            log_i "Permission: ${I_PERM}"
+            case ${I_PERM} in
+                "700" | "600" | "755" | "655" | "644" | "544")
+                    if [ "${I_USER}" == "root" ] || [ "${O_USER}" == "root" ]; then
+                        time sudo cp -R "${CP_SRC}" "${2}"
+                    else
+                        time sudo -u "${I_USER}" cp -R "${CP_SRC}" "${2}"
+                    fi
+                    ;;
+                *)
+                    time cp -R "${CP_SRC}" "${2}"
+                    ;;
+            esac
+            return
+        fi
+    fi
+}
+
+#******************************************************************************
+
+# Unpack a given archive
+#
+# ${1}: <path>/<filename>.zip
+# ${2}: [<output_path>]
+function uncompress() {
+    if [ "$#" != "1" ] && [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <path>/<filename>.zip [<output_path>]"
+        exit 1
+    else
+        local ARCHIVE="${1}"
+        local DIR=${2-.}
+        local RESULT TARFLAGS ZIPFLAGS
+        TARFLAGS="xpf"
+        ZIPFLAGS="-o" #-q
+        #mkdir -p "${DIR}"
+
+        detect_owner_group_permission "${ARCHIVE}"
+        local I_USER="${F_USER}"
+        clean_owner_group_permission
+
+        case "${ARCHIVE}" in
+            *.zip)
+                if [ "${OS}" == "linux" ] && [ ! -e "/usr/bin/unzip" ]; then
+                    sudo -E apt-get install -y --force-yes zip unzip
+                fi
+                (cd "${DIR}" && time log_a sudo -u "${I_USER}" unzip ${ZIPFLAGS} "${ARCHIVE}")
+                ;;
+            *.tar)
+                time log_a sudo -u "${I_USER}" tar ${TARFLAGS} "${ARCHIVE}" -C "${DIR}"
+                ;;
+            *.tar.gz | *.tgz)
+                time log_a sudo -u "${I_USER}" tar z${TARFLAGS} "${ARCHIVE}" -C "${DIR}"
+                ;;
+            *.tar.bz2)
+                time log_a sudo -u "${I_USER}" tar j${TARFLAGS} "${ARCHIVE}" -C "${DIR}"
+                ;;
+            # *.rar)
+            #     time log_a sudo -u "${I_USER}" unrar x "${ARCHIVE}" "${DIR}"
+            #     ;;
+            *)
+                log_e "Invalid compress file extension"
+                ;;
+        esac
+        # remove ._* files by MacOSX to preserve resource forks we don't need
+        find "${DIR}" -name "\._*" -exec rm "{}" \;
+        sudo -u "${I_USER}" du -sh "${ARCHIVE%.*}".*
+    fi
+}
+
+# Pack a given archive
+#
+# ${1}: <path>/<filename>.zip
+# ${2}: <dirname/filename>
+function compress() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <path>/<filename>.zip <dirname/filename>"
+        exit 1
+    else
+        local ARCHIVE="${1}"
+        local SRC_DIR="${2}"
+        local TARFLAGS ZIPFLAGS
+        TARFLAGS="cf"
+        ZIPFLAGS="-r" #-9qr
+        # Ensure symlinks are stored as is in zip files. for toolchains
+        # this can save up to 7 MB in the size of the final archive
+        #ZIPFLAGS="${ZIPFLAGS} --symlinks"
+
+        detect_owner_group_permission "${SRC_DIR}"
+        local I_USER="${D_USER}"
+        clean_owner_group_permission
+
+        case "${ARCHIVE}" in
+            *.zip)
+                #install_zip_deb
+                if [ ! -e "/usr/bin/zip" ] && [ "${OS}" == "linux" ]; then
+                    sudo -E apt-get install -y --force-yes zip unzip
+                fi
+                time log_a sudo -u "${I_USER}" zip ${ZIPFLAGS} "${ARCHIVE}" "${SRC_DIR}"
+                ;;
+            *.tar)
+                time log_a sudo -u "${I_USER}" tar ${TARFLAGS} "${ARCHIVE}" "${SRC_DIR}"
+                ;;
+            *.tar.gz | *.tgz)
+                time log_a sudo -u "${I_USER}" tar z${TARFLAGS} "${ARCHIVE}" "${SRC_DIR}"
+                ;;
+            *.tar.bz2)
+                time log_a sudo -u "${I_USER}" tar j${TARFLAGS} "${ARCHIVE}" "${SRC_DIR}"
+                ;;
+            *.rar)
+                time log_a sudo -u "${I_USER}" rar "${ARCHIVE}" "${SRC_DIR}"
+                ;;
+            *)
+                log_e "Invalid compress file extension"
+                ;;
+        esac
+        sudo -u "${I_USER}" du -sh "${ARCHIVE%.*}".*
+    fi
+}
+
+#******************************************************************************
+# This section
+# http://how-to.wikia.com/wiki/How_to_display_and_kill_zombie_processes
+
+function display_zombies_process() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        ps -aux | grep Z
+
+        for PID in $(ps -A -ostat,ppid | grep -e '^[Zz]' | awk '{print $2}'); do
+            pstree -p ${PID}
+        done
+
+        for PID in $(ps axo pid=,stat= | awk '$2~/^Z/ { print $1 }'); do
+            pstree -p ${PID}
+        done
+    fi
+}
+
+function kill_zombies_process() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        log_a "sudo kill -HUP $(ps -A -ostat,ppid | grep -e '^[Zz]' | awk '{print $2}')"
+        log_i "Display Zombies Process"
+        ps aux | awk '{ print $8 " " $2 }' | grep -w Z
+    fi
+}
+
+#******************************************************************************
+
+# function iptable_accept_all() {
+#     if [ "$#" != "1" ]; then
+#         log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+#         log_e "${FUNCNAME[0]} $# ${*}"
+#     else
+#         log_m "${FUNCNAME[0]} $# ${*}"
+#         # cd "${TOP_DIR:?}" || exit 1
+
+#         echo -e "\n>>> IP6: ...\n"
+#         sudo ip6tables --policy INPUT   ACCEPT;
+#         sudo ip6tables --policy OUTPUT  ACCEPT;
+#         sudo ip6tables --policy FORWARD ACCEPT;
+
+#         sudo ip6tables --list --numeric
+
+#         echo -e "\n>>> IP4: ...\n"
+#         sudo iptables --policy INPUT   ACCEPT;
+#         sudo iptables --policy OUTPUT  ACCEPT;
+#         sudo iptables --policy FORWARD ACCEPT;
+
+#         sudo iptables --list --numeric
+#     fi
+# }
+
+function iptable_reset_all() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        echo -e "\n>>> IP6: ...\n"
+        sudo ip6tables -Z # zero counters
+        sudo ip6tables -F # flush (delete) rules
+        sudo ip6tables -t nat
+        sudo ip6tables -t mangle -F
+        sudo ip6tables -X # delete all extra chains
+
+        sudo ip6tables --list --numeric
+
+        echo -e "\n>>> IP4: ...\n"
+        sudo iptables -Z # zero counters
+        sudo iptables -F # flush (delete) rules
+        sudo iptables -t nat
+        sudo iptables -t mangle -F
+        sudo iptables -X # delete all extra chains
+
+        sudo iptables --list --numeric
+    fi
+}
+
+#******************************************************************************
+
+function create_sequential_directory() {
+    if [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <DIR> <PREFIX> <SIZE>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "3" ]; then
+            local DIR=${1}
+            local PREFIX=${2}
+            local SIZE=${3}
+        fi
+        cd "${DIR:?}" || exit 1
+        for i in $(seq -f "%02g" 1 ${SIZE}); do
+            mkdir -p ${DIR}/${PREFIX}_${i}
+        done
+    fi
+}
+
+#******************************************************************************

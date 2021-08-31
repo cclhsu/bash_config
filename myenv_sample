@@ -1,5 +1,6 @@
-# cp myenv_template ${HOME}/.myenv
-# cp myenv ${HOME}/.myenv
+# mkdir -p ${HOME}/.my_libs/bash/
+# cp myenv_template ${HOME}/.my_libs/bash/myenv
+# cp myenv ${HOME}/.my_libs/bash/myenv
 
 # # Master Account
 # MASTER_USER=
@@ -19,6 +20,11 @@ PASSWORD=
 # OS_USER_HOME="${USER_HOME}/${OS_USER}"
 # OS_USER_BIN="${USER_HOME}/${OS_USER}/bin"
 
+# # SSH User Account
+# SSH_USER=
+# SSH_USER_PASSWORD=
+# SSH_USER_PEM=
+
 # # DB Admin Account
 # DB_ADMIN="root"
 # DB_ADMIN_PASSWORD=
@@ -28,9 +34,20 @@ PASSWORD=
 # DB_USER="tester"
 # DB_USER_PASSWORD=
 
+# # MARIADB User Account
+# MARIADB_NAME="test_db"
+# MARIADB_USER="tester"
+# MARIADB_USER_PASSWORD=
+
+# # POSTGRE User Account
+# POSTGRES_NAME="test_db"
+# POSTGRES_USER="tester"
+# POSTGRES_USER_PASSWORD=
+
 # GitHub Account
 GITHUB_TEAM=
 GITHUB_USER=tester
+GITHUB_USER_NAME="tester"
 GITHUB_USER_PASSWORD=
 GITHUB_USER_EMAIL=tester@example.com
 

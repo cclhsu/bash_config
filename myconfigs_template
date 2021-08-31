@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 #******************************************************************************
-
-# Copyright 2015 Clark Hsu
+# Copyright 2020 Clark Hsu
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,44 +16,108 @@
 
 #******************************************************************************
 # How To
-# cp myconfigs_template ${HOME}/.myconfigs
+# mkdir -p ${HOME}/.my_libs/bash/
+# cp myconfigs_template ${HOME}/.my_libs/bash/myconfigs
 
 #******************************************************************************
 # Mark Off this section if use as lib
 
-# PROGRAM_NAME=$(basename ${0})
+# PROGRAM_NAME=$(basename "${0}")
 # AUTHOR=clark_hsu
 # VERSION=0.0.1
 
 #******************************************************************************
 # echo -e "\n================================================================================\n"
-#echo "Begin: $(basename ${0})"
+#echo "Begin: $(basename "${0}")"
 #set -e # Exit on error On
 #set -x # Trace On
 #******************************************************************************
 # Functions
 
-check_cmd() {
+function check_command_exist() {
     # which "${1}" 2>/dev/null
     type "${1}" 2>/dev/null
+    # command -v "${1}" >/dev/null 2>&1
     return $?
 }
 
-check_file_exist() {
+function check_file_exist() {
     test -f "${1}" 2>/dev/null
     return $?
 }
 
-check_directory_exist() {
+function check_directory_exist() {
     test -d "${1}" 2>/dev/null
     return $?
 }
 
-check_run_state() {
+function check_run_state() {
     if [ "${1}" != "0" ]; then
         exit 1
     fi
 }
+
+function find_program() {
+    if [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <PROGRAM_VARIABLE> <PROGRAM_NAME>"
+        exit 1
+    else
+        local PROGRAM RETURN
+        PROGRAM=$(which ${2} 2>/dev/null || :)
+        RETURN=$?
+        if [ ${RETURN} != 0 ]; then
+            PROGRAM=
+        fi
+        eval ${1}=\"${PROGRAM}\"
+        return ${RETURN}
+    fi
+}
+
+function check_commands_exist() {
+    if [ "$#" == "0" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <BINARIES>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        local BINARIES=${*}
+
+        for BIN in ${BINARIES[*]}; do
+            # if [ -x "$(command -v ${BIN})" ]; then
+            if [ -x "$(type ${BIN})" ]; then
+                echo "${BIN} is not installed"
+            else
+                echo "${BIN} is installed"
+            fi
+        done
+    fi
+}
+# check_commands_exist curl grep awk sed jq blkid findmnt lsblk
+
+function check_services_started() {
+    if [ "$#" == "0" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SERVICES>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        local SERVICES=${*}
+
+        for SERVICE in ${SERVICES[*]}; do
+            if [ "$(
+                sudo systemctl status ${SERVICE}.service
+                echo $?
+            )" != 0 ]; then
+                echo "${SERVICE} is not functioning properly"
+            else
+                echo "${SERVICE} is functioning properly"
+            fi
+        done
+    fi
+}
+# check_services_started iscsid
 
 #******************************************************************************
 
@@ -104,20 +167,39 @@ function log_a() {
 }
 
 function msg() {
-    echo -e "\n>> ${*}...\n"
+    echo -e "\n>>> ${*}...\n"
 }
 
 #******************************************************************************
 # Source
 
-MYHOME=${HOME}/Documents # [ ${HOME} | ${HOME}/Documents ]
-OS_TYPE=                 # macos | opensuse | centos | ubuntu
+# OS=$(uname -s | tr A-Z a-z)                                                                                                                                    # darwin | linux
+# ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')                                                                                                                       # x86_64 | amd64
+DISTRO=$(cat /etc/*-release 2>/dev/null | uniq -u | grep ^ID= | cut -d = -f 2 | sed 's/\"//g' | sed 's/linux/-linux/g' && sw_vers -productName 2>/dev/null | sed 's/ //g' | tr A-Z a-z) # alpine | alma-linux | centos | debian | fedora | macosx | opensuse-leap| oracle-linux | rocky-linux | sles | ubuntu
+# PACKAGE_MANAGER=$(basename $(command -v {apt-get,brew,dnf,emerge,pacman,yum,zypper,xbps-install} 2>/dev/null) 2>/dev/null || basename $(command -v apk 2>/dev/null) 2>/dev/null)
+# PACKAGE_SYSTEM=$(basename $(command -v {dpkg,pkgbuild,rpm} 2>/dev/null) 2>/dev/null || basename $(command -v apk 2>/dev/null) 2>/dev/null)
+# echo "${OS} ${ARCH} ${DISTRO} ${PACKAGE_MANAGER} ${PACKAGE_SYSTEM}"
 
-CLOUD_DRIVE_NAME=remote
-# CLOUD_DRIVE_NAME=googledrive
-DOCUMENTS_PATH=${HOME}/Documents
+MYHOME="${HOME}/Documents" # [ ${HOME} | ${HOME}/Documents ]
+DOCUMENTS_PATH="${HOME}/Documents"
+MYPROJECT_PATH="${HOME}/Documents/myProject"
+MY_OS_BIN="${MYPROJECT_PATH}/Development/bash/src/bash/bash_utils/${DISTRO}/bin"
+SOURCE_CODE_PATH="${HOME}/src"
+CAASP_VERSION=caasp4.5 # caasp4.0 | caasp4.5 | caasp5.0
+
+LOCATION=remote
+PLATFORM=libvirt
+PLATFORM_DISTRO=centos # centos | oracle-linux | ubuntu | mos | rancher-k3os | rancher-harvester
+KUBERNETES_DISTRO=k3s  # k3s | rke2 | rke
+RUNTIME=daemon
+SSH_USER=${PLATFORM_DISTRO} # ${PLATFORM_DISTRO} | centos | ubuntu | mos | rancher
+SSH_GROUP=remotes_env       # remotes | remotes_env | remotes_mos | remotes_rancher
+# SSH_USER_PASSWORD=        # linux
+# SSH_USER_PEM=
+
+CLOUD_DRIVE_NAME=remote # remote | googledrive
 GOOGLE_DRIVE_PATH="${HOME}/Google Drive"
-if [ "${OS_TYPE}" == "macos" ]; then
+if [ "${DISTRO}" == "macosx" ]; then
     CLOUD_REPLICA_PATH=${GOOGLE_DRIVE_PATH}
 else
     CLOUD_REPLICA_PATH=${HOME}/GoogleDriveCopy
@@ -125,28 +207,31 @@ fi
 CLOUD_MOUNT_PATH=${HOME}/GoogleDriveMount
 
 UTILS_HOME=my_utils
-HOME_DIR=${HOME}/.${UTILS_HOME}
+HOME_DIR="${HOME}/.${UTILS_HOME}"
 
 [[ -d "${HOME_DIR}" ]] || mkdir "${HOME_DIR}"
-cd "${HOME_DIR}"
+cd "${HOME_DIR}" || exit 1
 
-SCRIPT_DIR=$(basename "${0}")
-SCRIPT_DIR=${SCRIPT_DIR/.sh/}
+# SCRIPT_DIR=$(basename "${0}")
+# SCRIPT_DIR=${SCRIPT_DIR/.sh/}
+SCRIPT_DIR=$(basename $(dirname "${0}"))
 
-# echo "Utilies Home: ${HOME_DIR}"
+# echo "Utilities Home: ${HOME_DIR}"
 # echo "Script Home: ${SCRIPT_DIR}"
 
 [[ -d "${SCRIPT_DIR}" ]] || mkdir "${SCRIPT_DIR}"
-cd "${SCRIPT_DIR}"
+cd "${SCRIPT_DIR}" || exit 1
 
 if [ -e "${HOME}/.bashrc" ]; then
     source ${HOME}/.bashrc
+elif [ -e "${HOME}/.bash_profile" ]; then
+    source "${HOME}/.bash_profile"
 fi
 
 #******************************************************************************
 #set +e # Exit on error Off
 #set +x # Trace Off
-#echo "End: $(basename ${0})"
+#echo "End: $(basename "${0}")"
 # echo -e "\n================================================================================\n"
 # exit 0
 #******************************************************************************
