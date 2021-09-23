@@ -55,7 +55,7 @@ function source_rc() {
             # centos | fedora | rhel | oracle-linux | alma-linux | rocky-linux) ;;
             # cirros) ;;
             # debian | raspios | ubuntu) ;;
-            # macosx) ;;
+            # macos | macosx) ;;
             # opensuse-leap | opensuse-tumbleweed | sles) ;;
             windows) ;;
 
@@ -511,7 +511,7 @@ function set_alias_by_distribution() {
 
                 OPEN="open" # xdg-open | open
                 ;;
-            macosx)
+            macos | macosx)
                 USER_BIN="/usr/local/bin"
                 USER_LOCAL_BIN="/usr/local/bin"
                 ETC="/usr/local/etc"
@@ -521,7 +521,7 @@ function set_alias_by_distribution() {
                 ADD_KEY=""
                 ADD_REPO=""
                 REMOVE_REPO=""
-                REPO_UPDATE="cd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core; git stash; git clean -fdx; brew update;"
+                REPO_UPDATE="cd /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core; git stash; git clean -fdx; brew update; brew list;"
                 if [ "${CASK}" != "" ] && [ ${CASK} == true ]; then
                     INSTALL_PACKAGE="brew install --cask" # --force # --with-default-names
                     REINSTALL_PACKAGE=""
@@ -595,7 +595,7 @@ function add_key_repo() {
                 ;;
             rancher-harvester | rancher-k3os | rancher-os) ;;
             cirros) ;;
-            macosx) ;;
+            macos | macosx) ;;
             debian | raspios | ubuntu)
                 if [ "${3}" != "" ]; then
                     curl -L "${3}" | sudo apt-key add -
@@ -639,7 +639,7 @@ function delete_key_repo() {
                 ;;
             rancher-harvester | rancher-k3os | rancher-os) ;;
             cirros) ;;
-            macosx) ;;
+            macos | macosx) ;;
             debian | raspios | ubuntu)
                 sudo rm -f "/etc/apt/sources.list.d/${2}.list"
                 ;;
@@ -3701,25 +3701,43 @@ function create_docker_app_project_makefile() {
 # TOP_DIR=$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TOP_DIR=$(shell dirname $(abspath $(firstword $(MAKEFILE_LIST))))
 PROJECT_TYPE=
-# https://hub.docker.com/_/${OFFICIAL_PROJECT}
-DOCKER_REGISTRY=
-DOCKER_PROJECT=$(notdir $(TOP_DIR))
-# DOCKER_PROJECT=${OFFICIAL_PROJECT}
-DOCKER_PROJECT_NAME=$(shell echo $(DOCKER_PROJECT) | cut -d'/' -f2 | tr -d '[:space:]')
-# latest | alpine3.13 | 13.3-buster
+# https://hub.docker.com/_/<OFFICIAL_DOCKER_PROJECT>
+# make USE_OFFICIAL=1 <COMMAND>
+ifdef USE_OFFICIAL
+    # docker.io | quay.io | gcr.io
+    DOCKER_REGISTRY=
+    # <OFFICIAL_DOCKER_PROJECT> | $(shell echo $(notdir $(TOP_DIR)) | cut -d '/' -f2 | tr -d '[:space:]' | cut -d '_' -f2)
+    DOCKER_PROJECT=$(shell echo $(notdir $(TOP_DIR)) | cut -d '/' -f2 | tr -d '[:space:]' | cut -d '_' -f2)
+else
+    # $(DISTRO)_base | cclhsu
+    DOCKER_REGISTRY=alpine_base/
+    # <DISTRO>_helloworld | $(notdir $(TOP_DIR)) | helloworld
+    DOCKER_PROJECT=$(notdir $(TOP_DIR))
+endif
+DOCKER_PROJECT_NAME=$(shell echo $(DOCKER_PROJECT) | cut -d '/' -f2 | tr -d '[:space:]')
+# Dockerfile | SDK.Dockerfile | SDKMAN.Dockerfile | Multi-Stages.Dockerfile
+DOCKER_FILE=Dockerfile
+# docker-compose.yml | docker-compose.yaml
+DOCKER_COMPOSE_FILE=docker-compose.yml
+
+# latest | alpine3.14 | 13.3-buster
 DOCKER_TAG=latest
 # USER_NAME=
 # USER_PASSWORD=
 # SRC_DIR=
 # MOUNT_DIR=
-# PORT=
-# DB_NAME=
-# DB_USER_NAME=
-# DB_USER_PASSWORD=
-# DB_PORT=
+PORT=8080
+DB_NAME=
+DB_USER_NAME=
+DB_USER_PASSWORD=
+DB_PORT=5432
+PROJECT_FOLDER=/project
+DATA_FOLDER=data
 
-DOCKER_RUN=docker run --rm -d
-# DOCKER_RUN=docker run --rm -ti
+# docker_network | <docker-compose-project>_docker_network | host
+# DOCKER_NETWORK=docker_network
+# DOCKER_RUN=docker run --rm -d
+DOCKER_RUN=docker run --rm -ti
 # DOCKER_PARAMETERS=--network host --user $(id -u):$(id -g)
 # DOCKER_PARAMETERS=-e USER_NAME=$(USER_NAME) -e USER_PASSWORD=$(USER_PASSWORD) -p $(PORT):$(PORT) -v $(SRC_DIR):$(MOUNT_DIR)
 # DOCKER_PARAMETERS=-e DB_NAME=$(DB_NAME) -e DB_USER_NAME=$(DB_USER_NAME) -e DB_USER_PASSWORD=$(DB_USER_PASSWORD) -p $(DB_PORT):$(DB_PORT)
@@ -3781,6 +3799,20 @@ lint:  ## lint
 build: ## build
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> build...\n"
+    @# make clean
+    @# docker build -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) .
+    docker build --rm -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) .
+    docker rmi $(shell docker images -f "dangling=true" -q) 2>/dev/null; true
+    @echo -e "\n======================================================================\n"
+
+.PHONY: nocache
+nocache: ## nocache
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> nocache...\n"
+    @# make clean
+    @# docker build -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) --no-cache .
+    docker build --rm -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) --no-cache .
+    docker rmi $(shell docker images -f "dangling=true" -q) 2>/dev/null; true
     @echo -e "\n======================================================================\n"
 
 .PHONY: pull
@@ -3811,6 +3843,8 @@ stop: ## stop
     docker stop $(DOCKER_PROJECT_NAME); true
     docker rm -f $(DOCKER_PROJECT_NAME) 2>/dev/null; true
     docker volume prune --force 2>/dev/null; true
+    rm -rf tmp
+    sudo rm -rf ${DATA_FOLDER}
     @echo -e "\n======================================================================\n"
 
 .PHONY: logs
@@ -3840,7 +3874,7 @@ clean: ## clean
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> clean...\n"
     docker rm -f $(DOCKER_PROJECT) 2>/dev/null; true
-    docker rmi $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG)) 2>/dev/null; true
+    docker rmi $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) 2>/dev/null; true
     docker rm $(shell docker ps -a -q) 2>/dev/null; true
     docker rmi $(shell docker images -f "dangling=true" -q) 2>/dev/null; true
     docker volume prune --force 2>/dev/null; true
@@ -3849,6 +3883,40 @@ clean: ## clean
     @# find "$(TOP_DIR)" -type f -name "*.log" -print -delete;
     @# find "$(TOP_DIR)" -type f -name "*.pyc" -print -delete;
     @# find "$(TOP_DIR)" -type f -name "*.pid" -print -delete;
+    @echo -e "\n======================================================================\n"
+
+.PHONY: cp_default_config
+cp_default_config:
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> ...\n"
+    rm -rf defaultfs
+    mkdir -p defaultfs/etc/
+    docker cp $(DOCKER_PROJECT_NAME):/etc/$(APP) defaultfs/etc/$(APP) 2>/dev/null; true
+    docker cp $(DOCKER_PROJECT_NAME):/etc/$(APP).conf defaultfs/etc/$(APP).conf 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/conf.d
+    @# docker cp $(DOCKER_PROJECT_NAME):/etc/conf.d/$(APP) defaultfs/etc/conf.d/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/init.d
+    @# docker cp $(DOCKER_PROJECT_NAME):/etc/init.d/$(APP) defaultfs/etc/init.d/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/logrotate.d
+    @# docker cp $(DOCKER_PROJECT_NAME):/etc/logrotate.d/$(APP) defaultfs/etc/logrotate.d/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/sysconfig/
+    @# docker cp $(DOCKER_PROJECT_NAME):/etc/sysconfig/$(APP) defaultfs/etc/sysconfig/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/ssl
+    @# docker cp $(DOCKER_PROJECT_NAME):/etc/ssl/$(APP) defaultfs/etc/ssl/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/pki
+    @# docker cp $(DOCKER_PROJECT_NAME):/etc/pki/$(APP) defaultfs/etc/pki/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/usr/share/
+    @# docker cp $(DOCKER_PROJECT_NAME):/usr/share/$(APP) defaultfs/usr/share/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/var/www/
+    @# docker cp $(DOCKER_PROJECT_NAME):/var/www/html defaultfs/var/www/html 2>/dev/null; true
+    @echo -e "\n======================================================================\n"
+
+.PHONY: stop_all
+stop_all:
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> ...\n"
+    docker stop $(shell docker ps -a -q) 2>/dev/null; true
+    docker volume prune --force 2>/dev/null; true
     @echo -e "\n======================================================================\n"
 
 .PHONY: list
@@ -3864,14 +3932,15 @@ list: ## list
 # curl: ## curl
 #      @echo -e "\n======================================================================\n"
 #      @echo -e "\n>>> curl...\n"
-#      curl -OL http://localhost:8080
+#      @# curl -x 0.0.0.0:3128 -L http://www.google.com/
+#      curl -OL http://localhost:${PORT}
 #      @echo -e "\n======================================================================\n"
 
 # .PHONY: browser
 # browser: ## browser
 #      @echo -e "\n======================================================================\n"
 #      @echo -e "\n>>> browser...\n"
-#      open http://localhost:8080/
+#      open http://localhost:${PORT}/
 #      @echo -e "\n======================================================================\n"
 *EOF*
         unexpand -a -t 4 "${PROJECT_DIR:?}/${FILENAME}" >"${PROJECT_DIR:?}/${FILENAME}.tmp"
@@ -3911,27 +3980,48 @@ function create_podman_app_project_makefile() {
 # TOP_DIR=$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TOP_DIR=$(shell dirname $(abspath $(firstword $(MAKEFILE_LIST))))
 PROJECT_TYPE=
-# https://hub.docker.com/_/${OFFICIAL_PROJECT}
-PODMAN_REGISTRY=
-PODMAN_PROJECT=$(notdir $(TOP_DIR))
-# PODMAN_PROJECT=${OFFICIAL_PROJECT}
-PODMAN_PROJECT_NAME=$(shell echo $(PODMAN_PROJECT) | cut -d'/' -f2 | tr -d '[:space:]')
-# latest | alpine3.13 | 13.3-buster
+# https://hub.podman.com/_/<OFFICIAL_PODMAN_PROJECT>
+# make USE_OFFICIAL=1 <COMMAND>
+ifdef USE_OFFICIAL
+    # docker.io | quay.io | gcr.io
+    PODMAN_REGISTRY=
+    # <OFFICIAL_PODMAN_PROJECT> | $(shell echo $(notdir $(TOP_DIR)) | cut -d '/' -f2 | tr -d '[:space:]' | cut -d '_' -f2)
+    PODMAN_PROJECT=$(shell echo $(notdir $(TOP_DIR)) | cut -d '/' -f2 | tr -d '[:space:]' | cut -d '_' -f2)
+else
+    # $(DISTRO)_base | cclhsu
+    PODMAN_REGISTRY=alpine_base/
+    # <DISTRO>_helloworld | $(notdir $(TOP_DIR)) | helloworld
+    PODMAN_PROJECT=$(notdir $(TOP_DIR))
+endif
+PODMAN_PROJECT_NAME=$(shell echo $(PODMAN_PROJECT) | cut -d '/' -f2 | tr -d '[:space:]')
+# Podmanfile | SDK.Podmanfile | SDKMAN.Podmanfile | Multi-Stages.Podmanfile
+PODMAN_FILE=Podmanfile
+# podman-compose.yml | podman-compose.yaml
+PODMAN_COMPOSE_FILE=podman-compose.yml
+
+# latest | alpine3.14 | 13.3-buster
 PODMAN_TAG=latest
 # USER_NAME=
 # USER_PASSWORD=
 # SRC_DIR=
 # MOUNT_DIR=
-# PORT=
-# DB_NAME=
-# DB_USER_NAME=
-# DB_USER_PASSWORD=
-# DB_PORT=
+PORT=8080
+DB_NAME=
+DB_USER_NAME=
+DB_USER_PASSWORD=
+DB_PORT=5432
+PROJECT_FOLDER=/project
+DATA_FOLDER=data
 
-PODMAN_RUN=podman run --rm -d
-# PODMAN_RUN=podman run --rm -ti
+# podman_network | <podman-compose-project>_podman_network | host
+# PODMAN_NETWORK=podman_network
+# PODMAN_RUN=podman run --rm -d
+PODMAN_RUN=podman run --rm -ti
 # PODMAN_PARAMETERS=--network host --user $(id -u):$(id -g)
 # PODMAN_PARAMETERS=-e USER_NAME=$(USER_NAME) -e USER_PASSWORD=$(USER_PASSWORD) -p $(PORT):$(PORT) -v $(SRC_DIR):$(MOUNT_DIR)
+# PODMAN_PARAMETERS=-e DB_NAME=$(DB_NAME) -e DB_USER_NAME=$(DB_USER_NAME) -e DB_USER_PASSWORD=$(DB_USER_PASSWORD) -p $(DB_PORT):$(DB_PORT)
+# PODMAN_COMMAND=/bin/bash
+# PODMAN_COMMAND=entrypoint.sh
 
 # ifneq ("$(wildcard VERSION.txt)", "")
 #     TAG=$(shell grep -i version VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
@@ -3950,8 +4040,8 @@ PODMAN_RUN=podman run --rm -d
 #     GITHUB_USER_PASSWORD=
 #     GITHUB_USER_TOKEN=
 #     GITHUB_USER_EMAIL=cclhsu@yahoo.com
-#     DOCKER_USER=cclhsu
-#     DOCKER_PASSWORD=
+#     PODMAN_USER=cclhsu
+#     PODMAN_PASSWORD=
 # endif
 
 ##### HOWTO #####
@@ -3988,6 +4078,20 @@ lint:  ## lint
 build: ## build
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> build...\n"
+    @# make clean
+    @# podman build -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) .
+    podman build --rm -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) .
+    podman rmi $(shell podman images -f "dangling=true" -q) 2>/dev/null; true
+    @echo -e "\n======================================================================\n"
+
+.PHONY: nocache
+nocache: ## nocache
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> nocache...\n"
+    @# make clean
+    @# podman build -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) --no-cache .
+    podman build --rm -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) --no-cache .
+    podman rmi $(shell podman images -f "dangling=true" -q) 2>/dev/null; true
     @echo -e "\n======================================================================\n"
 
 .PHONY: pull
@@ -4008,7 +4112,7 @@ push: ## push
 run: ## run
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> run...\n"
-    $(PODMAN_RUN) $(PODMAN_PARAMETERS) --name $(PODMAN_PROJECT_NAME) $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG)
+    $(PODMAN_RUN) $(PODMAN_PARAMETERS) --name $(PODMAN_PROJECT_NAME) $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) $(PODMAN_COMMAND)
     @echo -e "\n======================================================================\n"
 
 .PHONY: stop
@@ -4018,6 +4122,8 @@ stop: ## stop
     podman stop $(PODMAN_PROJECT_NAME); true
     podman rm -f $(PODMAN_PROJECT_NAME) 2>/dev/null; true
     podman volume prune --force 2>/dev/null; true
+    rm -rf tmp
+    sudo rm -rf ${DATA_FOLDER}
     @echo -e "\n======================================================================\n"
 
 .PHONY: logs
@@ -4046,6 +4152,50 @@ bash: ## bash
 clean: ## clean
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> clean...\n"
+    podman rm -f $(PODMAN_PROJECT) 2>/dev/null; true
+    podman rmi $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) 2>/dev/null; true
+    podman rm $(shell podman ps -a -q) 2>/dev/null; true
+    podman rmi $(shell podman images -f "dangling=true" -q) 2>/dev/null; true
+    podman volume prune --force 2>/dev/null; true
+    rm -rf tmp
+    @# sudo rm -rf ${SRC_DIR}
+    @# find "$(TOP_DIR)" -type f -name "*.log" -print -delete;
+    @# find "$(TOP_DIR)" -type f -name "*.pyc" -print -delete;
+    @# find "$(TOP_DIR)" -type f -name "*.pid" -print -delete;
+    @echo -e "\n======================================================================\n"
+
+.PHONY: cp_default_config
+cp_default_config:
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> ...\n"
+    rm -rf defaultfs
+    mkdir -p defaultfs/etc/
+    podman cp $(DOCKER_PROJECT_NAME):/etc/$(APP) defaultfs/etc/$(APP) 2>/dev/null; true
+    podman cp $(DOCKER_PROJECT_NAME):/etc/$(APP).conf defaultfs/etc/$(APP).conf 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/conf.d
+    @# podman cp $(DOCKER_PROJECT_NAME):/etc/conf.d/$(APP) defaultfs/etc/conf.d/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/init.d
+    @# podman cp $(DOCKER_PROJECT_NAME):/etc/init.d/$(APP) defaultfs/etc/init.d/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/logrotate.d
+    @# podman cp $(DOCKER_PROJECT_NAME):/etc/logrotate.d/$(APP) defaultfs/etc/logrotate.d/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/sysconfig/
+    @# podman cp $(DOCKER_PROJECT_NAME):/etc/sysconfig/$(APP) defaultfs/etc/sysconfig/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/ssl
+    @# podman cp $(DOCKER_PROJECT_NAME):/etc/ssl/$(APP) defaultfs/etc/ssl/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/etc/pki
+    @# podman cp $(DOCKER_PROJECT_NAME):/etc/pki/$(APP) defaultfs/etc/pki/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/usr/share/
+    @# podman cp $(DOCKER_PROJECT_NAME):/usr/share/$(APP) defaultfs/usr/share/$(APP) 2>/dev/null; true
+    @# mkdir -p defaultfs/var/www/
+    @# podman cp $(DOCKER_PROJECT_NAME):/var/www/html defaultfs/var/www/html 2>/dev/null; true
+    @echo -e "\n======================================================================\n"
+
+.PHONY: stop_all
+stop_all:
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> ...\n"
+    podman stop $(shell podman ps -a -q) 2>/dev/null; true
+    podman volume prune --force 2>/dev/null; true
     @echo -e "\n======================================================================\n"
 
 .PHONY: list
@@ -4061,14 +4211,15 @@ list: ## list
 # curl: ## curl
 #      @echo -e "\n======================================================================\n"
 #      @echo -e "\n>>> curl...\n"
-#      curl -OL http://localhost:8080
+#      @# curl -x 0.0.0.0:3128 -L http://www.google.com/
+#      curl -OL http://localhost:${PORT}
 #      @echo -e "\n======================================================================\n"
 
 # .PHONY: browser
 # browser: ## browser
 #      @echo -e "\n======================================================================\n"
 #      @echo -e "\n>>> browser...\n"
-#      open http://localhost:8080/
+#      open http://localhost:${PORT}/
 #      @echo -e "\n======================================================================\n"
 *EOF*
         unexpand -a -t 4 "${PROJECT_DIR:?}/${FILENAME}" >"${PROJECT_DIR:?}/${FILENAME}.tmp"
@@ -5620,7 +5771,7 @@ function typescript_create_project() {
     <script src="main.js" defer></script>
 </head>
 <body>
-    
+
 </body>
 </html>
 *EOF*
@@ -5841,7 +5992,7 @@ function install_requirements() {
             centos | fedora | rhel | debian | raspios | ubuntu | opensuse-leap | opensuse-tumbleweed | sles) ;;
             rancher-harvester | rancher-k3os | rancher-os) ;;
             cirros) ;;
-            macosx) ;;
+            macos | macosx) ;;
             microsoft) ;;
             *) ;;
         esac
@@ -5885,7 +6036,7 @@ function uninstall_requirements() {
             centos | fedora | rhel | debian | raspios | ubuntu | opensuse-leap | opensuse-tumbleweed | sles) ;;
             rancher-harvester | rancher-k3os | rancher-os) ;;
             cirros) ;;
-            macosx) ;;
+            macos | macosx) ;;
             microsoft) ;;
             *) ;;
         esac
@@ -6330,7 +6481,7 @@ function install_by_snap() {
             opensuse-leap | opensuse-tumbleweed | sles) ;;
             rancher-harvester | rancher-k3os | rancher-os) ;;
             cirros) ;;
-            macosx) ;;
+            macos | macosx) ;;
             microsoft) ;;
             *) ;;
         esac
@@ -6384,7 +6535,7 @@ function install_by_rpm() {
                 ;;
             rancher-harvester | rancher-k3os | rancher-os) ;;
             cirros) ;;
-            macosx) ;;
+            macos | macosx) ;;
             microsoft) ;;
             *) ;;
         esac
@@ -6601,14 +6752,50 @@ function install_completion() {
 # update
 
 function update() {
-    if [ "$#" != "0" ]; then
-        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+    if [ "$#" != "0" ] && [ "$#" != "8" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <GITHUB_USER> <GITHUB_PROJECT> <PACKAGE_VERSION> <PROJECT_BIN> <OS> <ARCH> <USER_BIN> <INSTALL_METHOD>"
         log_e "${FUNCNAME[0]} $# ${*}"
     else
         log_m "${FUNCNAME[0]} $# ${*}"
         # cd "${TOP_DIR:?}" || exit 1
 
+        # local PROJECT_BIN= #
+        # local INSTALL_METHOD= #
+
+        # case ${INSTALL_METHOD} in
+        #     bin | tar | zip)             #
+        #         update_by_bin_tar_zip # "${PROJECT_BIN}" "${USER_BIN}"
+        #         ;;
+        #     script)
+        #         update_by_script # "${PKILL_SCRIPT_URL}" "${UNINSTALL_SCRIPT_URL}" "${PROJECT_BIN}"
+        #         ;;
+        #     snap)
+        #         update_by_snap # "${UNINSTALL_PACKAGE}" "${PACKAGES}" "${PACKAGES_REPO_URL}" "${PACKAGES_REPO_NAME}" "${PACKAGES_KEY_URL}"
+        #         ;;
+        #     rpm)
+        #         update_by_rpm # "${UNINSTALL_PACKAGE}" "${PACKAGES}" "${PACKAGES_REPO_URL}" "${PACKAGES_REPO_NAME}" "${PACKAGES_KEY_URL}"
+        #         ;;
+        #     go)
+        #         update_by_go # "${PROJECT_GO_URL}" "${PROJECT_GO_BIN}"
+        #         ;;
+        #     npm)
+        #         # update_by_npm # "${PROJECT_NPM_BIN}"
+        #         npm update -g
+        #         ;;
+        #     pip)
+        #         update_by_pip # "${PROJECT_PYTHON_PACKAGES}" "${PROJECT_PYTHON_BIN}"
+        #         ;;
+        #     docker)
+        #         update_by_docker # "${DOCKER_USER}" "${DOCKER_PROJECT}" "${DOCKER_TAG}"
+        #         ;;
+        #     podman)
+        #         update_by_podman # "${PODMAN_USER}" "${PODMAN_PROJECT}" "${DOCKER_TAG}"
+        #         ;;
+        #     *) ;;
+        # esac
+
         bash -c "${REPO_UPDATE}"
+        bash -c "${CLEAN_CACHE}"
     fi
 }
 
@@ -6616,12 +6803,46 @@ function update() {
 # upgrade
 
 function upgrade() {
-    if [ "$#" != "0" ]; then
-        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+    if [ "$#" != "0" ] && [ "$#" != "8" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <GITHUB_USER> <GITHUB_PROJECT> <PACKAGE_VERSION> <PROJECT_BIN> <OS> <ARCH> <USER_BIN> <INSTALL_METHOD>"
         log_e "${FUNCNAME[0]} $# ${*}"
     else
         log_m "${FUNCNAME[0]} $# ${*}"
         # cd "${TOP_DIR:?}" || exit 1
+
+        # local PROJECT_BIN= #
+        # local INSTALL_METHOD= #
+
+        # case ${INSTALL_METHOD} in
+        #     bin | tar | zip)             #
+        #         upgrade_by_bin_tar_zip # "${PROJECT_BIN}" "${USER_BIN}"
+        #         ;;
+        #     script)
+        #         upgrade_by_script # "${PKILL_SCRIPT_URL}" "${UNINSTALL_SCRIPT_URL}" "${PROJECT_BIN}"
+        #         ;;
+        #     snap)
+        #         upgrade_by_snap # "${UNINSTALL_PACKAGE}" "${PACKAGES}" "${PACKAGES_REPO_URL}" "${PACKAGES_REPO_NAME}" "${PACKAGES_KEY_URL}"
+        #         ;;
+        #     rpm)
+        #         upgrade_by_rpm # "${UNINSTALL_PACKAGE}" "${PACKAGES}" "${PACKAGES_REPO_URL}" "${PACKAGES_REPO_NAME}" "${PACKAGES_KEY_URL}"
+        #         ;;
+        #     go)
+        #         upgrade_by_go # "${PROJECT_GO_URL}" "${PROJECT_GO_BIN}"
+        #         ;;
+        #     npm)
+        #         upgrade_by_npm # "${PROJECT_NPM_BIN}"
+        #         ;;
+        #     pip)
+        #         upgrade_by_pip # "${PROJECT_PYTHON_PACKAGES}" "${PROJECT_PYTHON_BIN}"
+        #         ;;
+        #     docker)
+        #         upgrade_by_docker # "${DOCKER_USER}" "${DOCKER_PROJECT}" "${DOCKER_TAG}"
+        #         ;;
+        #     podman)
+        #         upgrade_by_podman # "${PODMAN_USER}" "${PODMAN_PROJECT}" "${DOCKER_TAG}"
+        #         ;;
+        #     *) ;;
+        # esac
 
         bash -c "${UPGRADE_PACKAGE}"
         bash -c "${CLEAN_CACHE}"
@@ -6783,7 +7004,7 @@ function uninstall_by_snap() {
             opensuse-leap | opensuse-tumbleweed | sles) ;;
             rancher-harvester | rancher-k3os | rancher-os) ;;
             cirros) ;;
-            macosx) ;;
+            macos | macosx) ;;
             microsoft) ;;
             *) ;;
         esac
@@ -6828,7 +7049,7 @@ function uninstall_by_rpm() {
                 ;;
             rancher-harvester | rancher-k3os | rancher-os) ;;
             cirros) ;;
-            macosx) ;;
+            macos | macosx) ;;
             microsoft) ;;
             *) ;;
         esac
@@ -7050,7 +7271,7 @@ function start() {
                     ;;
                 rancher-harvester | rancher-k3os | rancher-os) ;;
                 cirros) ;;
-                macosx) ;;
+                macos | macosx) ;;
                 microsoft) ;;
                 *) ;;
             esac
@@ -7438,7 +7659,7 @@ function stop() {
                     ;;
                 rancher-harvester | rancher-k3os | rancher-os) ;;
                 cirros) ;;
-                macosx) ;;
+                macos | macosx) ;;
                 microsoft) ;;
                 *) ;;
             esac
@@ -7734,7 +7955,7 @@ function terraform_deploy() {
             # alpine) ;;
             # centos | fedora | rhel | debian | raspios | ubuntu | opensuse-leap | opensuse-tumbleweed | sles) ;;
             # cirros) ;;
-            # macosx) ;;
+            # macos | macosx) ;;
             # microsoft) ;;
             *) ;;
         esac
@@ -7837,7 +8058,7 @@ function terraform_undeploy() {
             # alpine) ;;
             # centos | fedora | rhel | debian | raspios | ubuntu | opensuse-leap | opensuse-tumbleweed | sles) ;;
             # cirros) ;;
-            # macosx) ;;
+            # macos | macosx) ;;
             # microsoft) ;;
             *) ;;
         esac
@@ -7919,7 +8140,7 @@ function status() {
         #     alpine) ;;
         #     centos | fedora | rhel | debian | raspios | ubuntu | opensuse-leap | opensuse-tumbleweed | sles) ;;
         #     cirros) ;;
-        #     macosx) ;;
+        #     macos | macosx) ;;
         #     microsoft) ;;
         #     *) ;;
         # esac
@@ -7950,7 +8171,7 @@ function status() {
                     ;;
                 rancher-harvester | rancher-k3os | rancher-os) ;;
                 cirros) ;;
-                macosx) ;;
+                macos | macosx) ;;
                 microsoft) ;;
                 *) ;;
             esac
@@ -8252,7 +8473,7 @@ function get_version() {
         #     alpine) ;;
         #     centos | fedora | rhel | debian | raspios | ubuntu | opensuse-leap | opensuse-tumbleweed | sles) ;;
         #     cirros) ;;
-        #     macosx) ;;
+        #     macos | macosx) ;;
         #     microsoft) ;;
         #     *) ;;
         # esac
@@ -11362,11 +11583,11 @@ function docker_build() {
         fi
 
         if [ "${DOCKER_USER}" == "" ]; then
-            # docker build --rm -f ${DOCKER_FILE} -t ${DOCKER_REGISTRY}/${DOCKER_PROJECT}:${DOCKER_TAG} .
-            docker build --rm -f ${DOCKER_FILE} -t ${DOCKER_PROJECT}:${DOCKER_TAG} .
+            # docker build --rm -f $(DOCKER_FILE) -t ${DOCKER_REGISTRY}/${DOCKER_PROJECT}:${DOCKER_TAG} .
+            docker build --rm -f $(DOCKER_FILE) -t ${DOCKER_PROJECT}:${DOCKER_TAG} .
         else
-            # docker build --rm -f ${DOCKER_FILE} -t ${DOCKER_REGISTRY}/${DOCKER_USER}/${DOCKER_PROJECT}:${DOCKER_TAG} .
-            docker build --rm -f ${DOCKER_FILE} -t ${DOCKER_USER}/${DOCKER_PROJECT}:${DOCKER_TAG} .
+            # docker build --rm -f $(DOCKER_FILE) -t ${DOCKER_REGISTRY}/${DOCKER_USER}/${DOCKER_PROJECT}:${DOCKER_TAG} .
+            docker build --rm -f $(DOCKER_FILE) -t ${DOCKER_USER}/${DOCKER_PROJECT}:${DOCKER_TAG} .
         fi
         docker rmi $(docker images -f "dangling=true" -q) 2>/dev/null
     fi
@@ -11392,11 +11613,11 @@ function docker_build_no_cache() {
         fi
 
         if [ "${DOCKER_USER}" == "" ]; then
-            # docker build --rm -f ${DOCKER_FILE} -t ${DOCKER_REGISTRY}/${DOCKER_PROJECT}:${DOCKER_TAG} --no-cache .
-            docker build --rm -f ${DOCKER_FILE} -t ${DOCKER_PROJECT}:${DOCKER_TAG} --no-cache .
+            # docker build --rm -f $(DOCKER_FILE) -t ${DOCKER_REGISTRY}/${DOCKER_PROJECT}:${DOCKER_TAG} --no-cache .
+            docker build --rm -f $(DOCKER_FILE) -t ${DOCKER_PROJECT}:${DOCKER_TAG} --no-cache .
         else
-            # docker build --rm -f ${DOCKER_FILE} -t ${DOCKER_REGISTRY}/${DOCKER_USER}/${DOCKER_PROJECT}:${DOCKER_TAG} --no-cache .
-            docker build --rm -f ${DOCKER_FILE} -t ${DOCKER_USER}/${DOCKER_PROJECT}:${DOCKER_TAG} --no-cache .
+            # docker build --rm -f $(DOCKER_FILE) -t ${DOCKER_REGISTRY}/${DOCKER_USER}/${DOCKER_PROJECT}:${DOCKER_TAG} --no-cache .
+            docker build --rm -f $(DOCKER_FILE) -t ${DOCKER_USER}/${DOCKER_PROJECT}:${DOCKER_TAG} --no-cache .
         fi
         docker rmi $(docker images -f "dangling=true" -q) 2>/dev/null
     fi

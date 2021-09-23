@@ -6,7 +6,7 @@ BASE=bash
 TOP_DIR=$(shell dirname $(abspath $(firstword $(MAKEFILE_LIST))))
 # PROJECT=$(notdir $(TOP_DIR))
 PROJECT=config
-REPO=$(BASE)/$(PROJECT)
+REPO=$(BASE)/$(DOCKER_PROJECT_NAME)
 
 ifneq ("$(wildcard VERSION.txt)", "")
 	TAG=$(shell grep -i version VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
