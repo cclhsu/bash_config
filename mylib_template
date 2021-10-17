@@ -1038,6 +1038,35 @@ function get_new_uuid() {
 
 #******************************************************************************
 
+function snake_case_to_camel_case() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        echo ${1} | sed -r 's/(^|_)([a-z])/\U\2/g'
+    fi
+}
+# snake_case_to_camel_case "get_name"
+
+function camel_case_to_snake_case() {
+    if [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <ARGS>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        echo ${1} | sed -r 's/([a-z0-9])([A-Z])/\1_\L\2/g'
+        # echo ${1} | sed 's/\([a-z0-9]\)\([A-Z]\)/\1_\L\2/g'
+    fi
+}
+# camel_case_to_snake_case "getName"
+
+#******************************************************************************
+
 function to_upper_case() {
     if [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <STRING>"
@@ -1316,7 +1345,7 @@ function trust_a_gpg_public_key() {
 
 function gpg_encrypt_file() {
     if [ "$#" != "0" ] && [ "$#" != "3" ]; then
-        log_e "Usage: ${FUNCNAME[0]} <EMAIL> <RECEIPIENT_EMAIL> <FILE_PATH>"
+        log_e "Usage: ${FUNCNAME[0]} <EMAIL> <RECEIPIENT_EMAIL_OR_GROUP> <FILE_PATH>"
         log_e "${FUNCNAME[0]} $# ${*}"
     else
         log_m "${FUNCNAME[0]} $# ${*}"
@@ -1324,18 +1353,18 @@ function gpg_encrypt_file() {
 
         if [ "$#" == "3" ]; then
             local EMAIL="${1}"
-            local RECEIPIENT_EMAIL="${2}"
+            local RECEIPIENT_EMAIL_OR_GROUP="${2}"
             local FILE_PATH="${3}"
         else
             local EMAIL="${1}"
-            local RECEIPIENT_EMAIL="${2}"
+            local RECEIPIENT_EMAIL_OR_GROUP="${2}"
             local FILE_PATH="${3}"
         fi
         local DIR=$(dirname ${FILE_PATH})
         local FILE=$(basename ${FILE_PATH})
         cd "${DIR:?}" || exit 1
 
-        gpg --encrypt --recipient ${RECEIPIENT_EMAIL} --recipient ${EMAIL} ${FILE}
+        gpg --encrypt --recipient ${RECEIPIENT_EMAIL_OR_GROUP} --recipient ${EMAIL} ${FILE}
     fi
 }
 

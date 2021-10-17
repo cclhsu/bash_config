@@ -39,7 +39,7 @@ PASSWORD=
 # MARIADB_USER="tester"
 # MARIADB_USER_PASSWORD=
 
-# # POSTGRE User Account
+# # POSTGRES User Account
 # POSTGRES_NAME="test_db"
 # POSTGRES_USER="tester"
 # POSTGRES_USER_PASSWORD=

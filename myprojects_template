@@ -3720,26 +3720,31 @@ DOCKER_FILE=Dockerfile
 # docker-compose.yml | docker-compose.yaml
 DOCKER_COMPOSE_FILE=docker-compose.yml
 
-# latest | alpine3.14 | 13.3-buster
+# latest | alpine3.14 | 13.3-buster | $(shell grep -i version VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
 DOCKER_TAG=latest
 # USER_NAME=
 # USER_PASSWORD=
 # SRC_DIR=
 # MOUNT_DIR=
-PORT=8080
+WEBUI_PORT=8080
+DAEMON_PORT=5000
 DB_NAME=
 DB_USER_NAME=
 DB_USER_PASSWORD=
 DB_PORT=5432
 PROJECT_FOLDER=/project
+CONF_FOLDER=etc/$(DOCKER_PROJECT)
+SRC_FOLDER=src
+# TEST_FOLDER=tests
 DATA_FOLDER=data
+LOG_FOLDER=log
 
 # docker_network | <docker-compose-project>_docker_network | host
 # DOCKER_NETWORK=docker_network
 # DOCKER_RUN=docker run --rm -d
 DOCKER_RUN=docker run --rm -ti
 # DOCKER_PARAMETERS=--network host --user $(id -u):$(id -g)
-# DOCKER_PARAMETERS=-e USER_NAME=$(USER_NAME) -e USER_PASSWORD=$(USER_PASSWORD) -p $(PORT):$(PORT) -v $(SRC_DIR):$(MOUNT_DIR)
+# DOCKER_PARAMETERS=-e USER_NAME=$(USER_NAME) -e USER_PASSWORD=$(USER_PASSWORD) -p $(WEBUI_PORT):$(WEBUI_PORT) -p $(DAEMON_PORT):$(DAEMON_PORT) -v $(SRC_DIR):$(MOUNT_DIR)
 # DOCKER_PARAMETERS=-e DB_NAME=$(DB_NAME) -e DB_USER_NAME=$(DB_USER_NAME) -e DB_USER_PASSWORD=$(DB_USER_PASSWORD) -p $(DB_PORT):$(DB_PORT)
 # DOCKER_COMMAND=/bin/bash
 # DOCKER_COMMAND=entrypoint.sh
@@ -3942,6 +3947,41 @@ list: ## list
 #      @echo -e "\n>>> browser...\n"
 #      open http://localhost:${PORT}/
 #      @echo -e "\n======================================================================\n"
+
+.PHONY: compose_up
+compose_up: ## compose_up
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> compose_up...\n"
+    docker-compose -f $(DOCKER_COMPOSE_FILE) up
+    @echo -e "\n======================================================================\n"
+
+.PHONY: compose_down
+compose_down: ## compose_down
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> compose_down...\n"
+    docker-compose -f $(DOCKER_COMPOSE_FILE) down
+    @echo -e "\n======================================================================\n"
+
+.PHONY: compose_start
+compose_start: ## compose_start
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> compose_start...\n"
+    docker-compose -f $(DOCKER_COMPOSE_FILE) start
+    @echo -e "\n======================================================================\n"
+
+.PHONY: compose_stop
+compose_stop: ## compose_stop
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> compose_stop...\n"
+    docker-compose -f $(DOCKER_COMPOSE_FILE) stop
+    @echo -e "\n======================================================================\n"
+
+.PHONY: compose_ps
+compose_ps: ## compose_ps
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> compose_ps...\n"
+    docker-compose -f $(DOCKER_COMPOSE_FILE) ps
+    @echo -e "\n======================================================================\n"
 *EOF*
         unexpand -a -t 4 "${PROJECT_DIR:?}/${FILENAME}" >"${PROJECT_DIR:?}/${FILENAME}.tmp"
         mv "${PROJECT_DIR:?}/${FILENAME}.tmp" "${PROJECT_DIR:?}/${FILENAME}"
@@ -3999,26 +4039,31 @@ PODMAN_FILE=Podmanfile
 # podman-compose.yml | podman-compose.yaml
 PODMAN_COMPOSE_FILE=podman-compose.yml
 
-# latest | alpine3.14 | 13.3-buster
+# latest | alpine3.14 | 13.3-buster | $(shell grep -i version VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
 PODMAN_TAG=latest
 # USER_NAME=
 # USER_PASSWORD=
 # SRC_DIR=
 # MOUNT_DIR=
-PORT=8080
+WEBUI_PORT=8080
+DAEMON_PORT=5000
 DB_NAME=
 DB_USER_NAME=
 DB_USER_PASSWORD=
 DB_PORT=5432
 PROJECT_FOLDER=/project
+CONF_FOLDER=etc/$(DOCKER_PROJECT)
+SRC_FOLDER=src
+# TEST_FOLDER=tests
 DATA_FOLDER=data
+LOG_FOLDER=log
 
 # podman_network | <podman-compose-project>_podman_network | host
 # PODMAN_NETWORK=podman_network
 # PODMAN_RUN=podman run --rm -d
 PODMAN_RUN=podman run --rm -ti
 # PODMAN_PARAMETERS=--network host --user $(id -u):$(id -g)
-# PODMAN_PARAMETERS=-e USER_NAME=$(USER_NAME) -e USER_PASSWORD=$(USER_PASSWORD) -p $(PORT):$(PORT) -v $(SRC_DIR):$(MOUNT_DIR)
+# PODMAN_PARAMETERS=-e USER_NAME=$(USER_NAME) -e USER_PASSWORD=$(USER_PASSWORD) -p $(WEBUI_PORT):$(WEBUI_PORT) -p $(DAEMON_PORT):$(DAEMON_PORT) -v $(SRC_DIR):$(MOUNT_DIR)
 # PODMAN_PARAMETERS=-e DB_NAME=$(DB_NAME) -e DB_USER_NAME=$(DB_USER_NAME) -e DB_USER_PASSWORD=$(DB_USER_PASSWORD) -p $(DB_PORT):$(DB_PORT)
 # PODMAN_COMMAND=/bin/bash
 # PODMAN_COMMAND=entrypoint.sh
@@ -4556,6 +4601,7 @@ init: ## init
     @echo -e "\n>>> init...\n"
     @# mkdir src tests
     @# sudo npm install --global typescript ts-node
+    nvm use --lts # --lts | node | default
     npm init -y
     tsc --init
     @echo -e "\n======================================================================\n"
@@ -4584,6 +4630,7 @@ test: ## test
     @# npm install -D chai mocha nyc @types/mocha @types/chai
     @# npm install -D nyc jasmine @types/jasmine
     @# npm install -D jest ts-jest @types/jest
+    @# npm install -D supertest @types/supertest
     npm test
     npm run coverage
     @echo -e "\n======================================================================\n"
@@ -5866,6 +5913,30 @@ describe('greeting', function() {
         #         cat <<\*EOF* >"${PROJECT_DIR}/tsconfig.json"
         # *EOF*
 
+        #         cat <<\*EOF* >"${PROJECT_DIR}/webpack.config.js"
+        # const path = require('path');
+
+        # module.exports = {
+        #   mode: 'development',
+        #   entry: './src/index.tsx',
+        # #   module: {
+        # #       rule: [
+        # #         {
+        # #             use: 'ts-loader',
+        # #             test: /\.tsx?$/,
+        # #             exclude: /node_modules/,
+        # #         }
+        # #       ]
+        # #   },
+        # #   resolve: {
+        # #       extensions: ['.tsx', '.ts', '.js']
+        # #   },
+        #   output: {
+        #     filename: 'index.js',
+        #     path: path.resolve(__dirname, 'dist'),
+        #   },
+        # };
+        # *EOF*
     fi
 }
 
@@ -5887,9 +5958,13 @@ function typescript_init_project() {
 
         cd "${PROJECT_DIR}" || exit 1
 
+        nvm use --lts # --lts | node | default
         # sudo npm install --global typescript ts-node
         npm init -y
         tsc --init # npx tsc --init
+        # npm install -D eslint eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser
+        npm install -D webpack webpack-cli webpack-dev-server webpack-node-externals clean-webpack-plugin webpack-merge copy-webpack-plugin html-webpack-plugin terser-webpack-plugin
+        npm install -D ts-loader css-loader style-loader ts-node
     fi
 }
 
@@ -5939,6 +6014,7 @@ function typescript_build_and_run_test() {
         # npm install -D chai mocha nyc @types/mocha @types/chai
         # npm install -D nyc jasmine @types/jasmine
         # npm install -D jest ts-jest @types/jest
+        # npm install -D supertest @types/supertest
         npm test
         npm run coverage
     fi
@@ -5963,6 +6039,1061 @@ function typescript_clean_project() {
         cd "${PROJECT_DIR}" || exit 1
 
         rm -rf src/main.js package-lock.json node_modules .nyc_output
+    fi
+}
+
+#******************************************************************************
+# Typescript - Reactjs Project
+
+function typescript_create_reactjs_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        # cd "${PROJECT_DIR}" || exit 1
+        cd "${SRC_ROOT}" || exit 1
+
+        nvm use --lts # --lts | node | default
+        # npm init react-app ${PROJECT_NAME} --template typescript
+        # yarn create react-app ${PROJECT_NAME} --template typescript
+        npx create-react-app ${PROJECT_NAME} --template typescript --use-npm
+
+        cd "${PROJECT_DIR}" || exit 1
+        # npm install -D eslint eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser
+        npm install -D webpack webpack-cli webpack-dev-server webpack-node-externals clean-webpack-plugin webpack-merge copy-webpack-plugin html-webpack-plugin terser-webpack-plugin
+        npm install -D ts-loader css-loader style-loader ts-node
+
+        # "include": ["src/**/*.ts, "src/**/*.tsx"],
+        # "exclude": ["node_modules"]
+        #         cat <<\*EOF* >"${PROJECT_DIR}/tsconfig.json"
+        # *EOF*
+
+        #         cat <<\*EOF* >"${PROJECT_DIR}/webpack.config.js"
+        # const path = require('path');
+
+        # module.exports = {
+        #   mode: 'development',
+        #   entry: './src/index.tsx',
+        # #   module: {
+        # #       rule: [
+        # #         {
+        # #             use: 'ts-loader',
+        # #             test: /\.tsx?$/,
+        # #             exclude: /node_modules/,
+        # #         }
+        # #       ]
+        # #   },
+        # #   resolve: {
+        # #       extensions: ['.tsx', '.ts', '.js']
+        # #   },
+        #   output: {
+        #     filename: 'index.js',
+        #     path: path.resolve(__dirname, 'dist'),
+        #   },
+        # };
+        # *EOF*
+    fi
+}
+
+function typescript_init_reactjs_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        nvm use --lts # --lts | node | default
+        npm install -D typescript ts-node
+        npm install -D eslint eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser
+        npm install -D webpack webpack-cli webpack-dev-server webpack-node-externals clean-webpack-plugin webpack-merge copy-webpack-plugin html-webpack-plugin terser-webpack-plugin
+        # npm install -D zip-webpack-plugin
+        # new WebpackZipPlugin({
+        #     frontShell: 'ls',
+        #     initialFile: './dist',
+        #     endPath: './build',
+        #     zipName: '[name].zip',
+        #     behindShell: 'scp **'
+        # }),
+        # npm install class-transformer class-validator
+        npm install redux react-redux react-router-dom @types/redux @types/react-redux @types/react-router-dom
+        npm install axios @types/axios
+        npm install c3 @types/c3
+    fi
+}
+
+function typescript_create_reactjs_dockerfile() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/dockerfile"
+# FROM node:latest
+FROM node:alpine
+# FROM alpine_base/alpine_nodejs:latest
+
+WORKDIR /project
+
+COPY package.json .
+COPY package-lock.json .
+RUN npm install
+
+ENV PORT 5000
+EXPOSE 5000
+
+# Method 1: run source code
+COPY . /project
+CMD ["npm", "run", "start:dev" ]
+# CMD ["npm", "run", "start"]
+
+# # Method 1: run source code
+# COPY . /project
+# CMD [ "node", "./src/server.js",  ]
+
+# # Method 4: compile externally and run from entrypoint
+# RUN apk add --update --no-cache bash && \
+#     rm -rf /var/cache/apk/*
+# COPY . /project
+# COPY entrypoint.sh /usr/bin/entrypoint.sh
+# RUN chmod +x /usr/bin/entrypoint.sh
+# ENTRYPOINT ["entrypoint.sh"]
+
+*EOF*
+    fi
+}
+
+function typescript_create_reactjs_dockercompose_file() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/docker-compose.yml"
+# https://docs.docker.com/compose/compose-file/
+# https://docs.docker.com/engine/reference/commandline/cli/
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+# https://docs.docker.com/engine/reference/commandline/volume_create
+version: '3.9'
+services:
+  frontend:
+    build: .
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/project
+    # depends_on:
+    #   - backend
+    #   - db_mysql
+    #   - db_postgres
+    #   - db_mongodb
+    #   - redis
+*EOF*
+    fi
+}
+
+#******************************************************************************
+# Typescript - Nextjs Project
+
+function typescript_create_nextjs_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        # cd "${PROJECT_DIR}" || exit 1
+        cd "${SRC_ROOT}" || exit 1
+
+        nvm use --lts # --lts | node | default
+    fi
+}
+
+function typescript_init_nextjs_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        nvm use --lts # --lts | node | default
+        npm install -D typescript ts-node
+        npm install -D eslint eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser
+        npm install -D webpack webpack-cli webpack-dev-server webpack-node-externals clean-webpack-plugin webpack-merge copy-webpack-plugin html-webpack-plugin terser-webpack-plugin
+        # npm install -D zip-webpack-plugin
+        # new WebpackZipPlugin({
+        #     frontShell: 'ls',
+        #     initialFile: './dist',
+        #     endPath: './build',
+        #     zipName: '[name].zip',
+        #     behindShell: 'scp **'
+        # }),
+        # npm install class-transformer class-validator
+    fi
+}
+
+#******************************************************************************
+# Typescript - Extension Project
+
+function typescript_create_reactjs_extension_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        # cd "${PROJECT_DIR}" || exit 1
+        cd "${SRC_ROOT}" || exit 1
+
+        mkdir -p ${PROJECT_DIR}/{src,tests}
+        mkdir -p ${PROJECT_DIR}/src/{background,contentScript,options,popup,static}
+        # touch ${PROJECT_DIR}/src/background/background.ts
+        # touch ${PROJECT_DIR}/src/contentScript/contentScript.ts
+        # touch ${PROJECT_DIR}/src/options/{options.css,options.tsx}
+        # touch ${PROJECT_DIR}/src/popup/{popup.css,popup.tsx}
+        # touch ${PROJECT_DIR}/src/static/manifest.json
+        # touch ${PROJECT_DIR}/{.gitignore,README.md,webpack.common.js,webpack.dev.js,webpack.prod.js}
+
+        cat <<\*EOF* >"${PROJECT_DIR}/src/background/background.ts"
+// TODO: background script
+chrome.runtime.onInstalled.addListener(() => {
+  // TODO: on installed function
+})
+*EOF*
+
+        cat <<\*EOF* >"${PROJECT_DIR}/src/contentScript/contentScript.ts"
+// TODO: content script
+*EOF*
+
+        cat <<\*EOF* >"${PROJECT_DIR}/src/options/options.css"
+body {
+  background-color: #1c1c1c;
+}
+*EOF*
+
+        cat <<\*EOF* >"${PROJECT_DIR}/src/options/options.tsx"
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './options.css'
+
+const App: React.FC<{}> = () => {
+  return (
+    <div>
+      <img src="static/logo192.png" />
+    </div>
+  )
+}
+
+const root = document.createElement('div')
+document.body.appendChild(root)
+ReactDOM.render(<App />, root)
+*EOF*
+
+        cat <<\*EOF* >"${PROJECT_DIR}/src/popup/popup.css"
+body {
+  background-color: #1c1c1c;
+}
+*EOF*
+
+        cat <<\*EOF* >"${PROJECT_DIR}/src/popup/popup.tsx"
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './popup.css'
+
+const App: React.FC<{}> = () => {
+  return (
+    <div>
+      <img src="static/logo192.png" />
+    </div>
+  )
+}
+
+const root = document.createElement('div')
+document.body.appendChild(root)
+ReactDOM.render(<App />, root)
+*EOF*
+    fi
+}
+
+function typescript_create_reactjs_extension_manifest_v2() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+    fi
+}
+
+function typescript_create_reactjs_extension_manifest_v3() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/src/static/manifest.json"
+{
+  "name": "React Extension",
+  "description": "Chrome Extension in React!",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "icons": {
+    "16": "/static/logo192.png",
+    "32": "/static/logo192.png",
+    "48": "/static/logo192.png",
+    "128": "/static/logo192.png"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "bookmarks",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "React Extension",
+    "default_icon": {
+      "16": "/static/logo192.png",
+      "32": "/static/logo192.png",
+      "48": "/static/logo192.png",
+      "128": "/static/logo192.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "options_page": "options.html"
+}
+*EOF*
+    fi
+}
+
+function typescript_init_reactjs_extension_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        nvm use --lts # --lts | node | default
+        npm init -y
+        tsc --init # npx tsc --init
+        npm install -D typescript ts-node
+        npm install -D react react-dom @types/react @types/react-dom
+        npm install -D @types/chrome
+        # npm install -D @babel/core @babel/preset-env @babel/plugin-transform-react-jsx babel-loader
+        # npm install -D eslint eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser
+        npm install -D webpack webpack-cli webpack-dev-server webpack-node-externals clean-webpack-plugin webpack-merge copy-webpack-plugin html-webpack-plugin terser-webpack-plugin
+        # npm install -D zip-webpack-plugin
+        # new WebpackZipPlugin({
+        #     frontShell: 'ls',
+        #     initialFile: './dist',
+        #     endPath: './build',
+        #     zipName: '[name].zip',
+        #     behindShell: 'scp **'
+        # }),
+        npm install -D ts-loader css-loader style-loader
+    fi
+}
+
+function typescript_set_package_json_for_reactjs_extension_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        sed -i '/"main": "index.js"/d' "${PROJECT_DIR}/package.json"
+        sed -i '/"main": "webpack.common.js"/d' "${PROJECT_DIR}/package.json"
+        sed -i '/^    "test": "echo \\"Error: no test specified\\" && exit 1"$/a\    "start": "webpack-dev-packer",\n    "build:dev": "webpack --watch --progress --config webpack.dev.js",\n    "build:prod": "webpack --progress --config webpack.prod.js"' "${PROJECT_DIR}/package.json"
+        sed -i 's/^    "test": "echo \\"Error: no test specified\\" \&\& exit 1"$/    "test": "echo \\"Error: no test specified\\" \&\& exit 1",/' "${PROJECT_DIR}/package.json"
+    fi
+}
+
+function typescript_set_tsconfig_json_for_reactjs_extension_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        # "include": ["src/**/*.ts, "src/**/*.tsx"],
+        # "exclude": ["node_modules"]
+        sed -i 's/\/\/ "jsx": "preserve",/"jsx": "react",      /g' "${PROJECT_DIR}/tsconfig.json"
+        sed -i 's/"module": "commonjs",/"module": "es6",/g     ' "${PROJECT_DIR}/tsconfig.json"
+        sed -i 's/"target": "es5",/"target": "es6",/g' "${PROJECT_DIR}/tsconfig.json"
+        sed -i 's/\/\/ "moduleResolution": "node",/"moduleResolution": "node",   /g' "${PROJECT_DIR}/tsconfig.json"
+    fi
+}
+
+function typescript_set_webpack_config_js_for_reactjs_extension_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/webpack.common.js"
+const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
+const HtmlPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+module.exports = {
+  entry: {
+    popup: path.resolve('src/popup/popup.tsx'),
+    options: path.resolve('src/options/options.tsx'),
+    background: path.resolve('src/background/background.ts'),
+    contentScript: path.resolve('src/contentScript/contentScript.ts'),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
+      {
+        test: /\.(jpg|jpeg|png|woff|woff2|eot|ttf|svg)$/,
+        type: 'asset/resource'
+      }
+    ]
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
+  },
+  plugins: [
+    new CleanWebpackPlugin({
+      cleanStaleWebpackAssets: false,
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "src/static/*.png",
+          to({ context, absoluteFilename }) {
+            return Promise.resolve("static/[name][ext]");
+          },
+        },
+        {
+          from: path.resolve('src/static/manifest.json'),
+          to: path.resolve('dist'),
+        },
+      ]
+    }),
+    ...getHtmlPlugins([
+      'popup',
+      'options'
+    ]),
+  ],
+  output: {
+    filename: '[name].js',
+    path: path.resolve('dist'),
+  },
+  optimization: {
+    splitChunks: {
+      chunks(chunk) {
+        return chunk.name !== 'contentScript' && chunk.name !== 'background'
+      }
+    },
+  }
+}
+
+function getHtmlPlugins(chunks) {
+  return chunks.map(chunk => new HtmlPlugin({
+    title: 'React Extension',
+    filename: `${chunk}.html`,
+    chunks: [chunk],
+  }))
+}
+*EOF*
+
+        cat <<\*EOF* >"${PROJECT_DIR}/webpack.dev.js"
+const { merge } = require('webpack-merge');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'development',
+  devtool: 'cheap-module-source-map',
+})
+*EOF*
+
+        cat <<\*EOF* >"${PROJECT_DIR}/webpack.prod.js"
+const { merge } = require('webpack-merge');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+  mode: 'production',
+  devtool: 'none',
+})
+*EOF*
+    fi
+}
+
+function typescript_create_gitignore_for_reactjs_extension_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/.gitignore"
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+/dist
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*EOF*
+    fi
+}
+
+function typescript_download_license_for_reactjs_extension_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        curl -L "https://www.apache.org/licenses/LICENSE-2.0.txt" -o "${PROJECT_DIR}/LICENSE"
+    fi
+}
+
+function typescript_download_icons_for_reactjs_extension_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        # https://icons8.com/icons/set/react
+        # https://github.com/facebook/create-react-app/tree/main/packages/cra-template-typescript/template/public
+        # curl -L "https://github.com/facebook/create-react-app/raw/main/packages/cra-template-typescript/template/public/favicon.ico" -o "${PROJECT_DIR}/src/static/favicon.ico"
+        curl -L "https://github.com/facebook/create-react-app/raw/main/packages/cra-template-typescript/template/public/logo192.png" -o "${PROJECT_DIR}/src/static/logo192.png"
+        curl -L "https://github.com/facebook/create-react-app/raw/main/packages/cra-template-typescript/template/public/logo512.png" -o "${PROJECT_DIR}/src/static/logo512.png"
+    fi
+}
+
+function typescript_create_readme_for_reactjs_extension_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=${4}
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/README.md"
+# React Chrome Extension Boilerplate
+
+Boilerplate for building Chrome Extensions in React and TypeScript using a simple Webpack build process.
+
+## Getting Started
+
+1. `npm i` to install dependencies
+2. `npm run build:dev` to start running the fast development mode Webpack build process that bundle files into the `dist` folder
+3. `npm i --save-dev <package_name>` to install new packages
+
+## Loading The Chrome Extension
+
+1. Open Chrome and navigate to `chrome://extensions/`
+2. Toggle on `Developer mode` in the top right corner
+3. Click `Load unpacked`
+4. Select the entire `dist` folder
+
+## Production Build
+
+1. `npm run build:prod` to generate a minimized production build in the `dist` folder
+2. ZIP the entire `dist` folder (e.g. `dist.zip`)
+3. Publish the ZIP file on the Chrome Web Store Developer Dashboard!
+
+## Initial Steps
+
+1. `git init` to start a new git repo for tracking your changes, do an initial base commit with all the default files
+2. Update `package.json`, important fields include `author`, `version`, `name` and `description`
+3. Update `manifest.json`, important fields include `version`, `name` and `description`
+4. Update `webpack.common.js`, the title in the `getHtmlPlugins` function should be your extension name
+
+## Default Boilerplate Notes
+
+- Folders get flattened, static references to images from HTML do not need to be relative (i.e. `logo192.png` instead of `../static/logo192.png`)
+- Importing local ts/tsx/css files should be relative, since Webpack will build a dependency graph using these paths
+- Update the manifest file as per usual for chrome related permissions, references to files in here should also be flattened and not be relative
+*EOF*
+    fi
+}
+
+#******************************************************************************
+# Typescript - Nestjs Project
+# https://docs.nestjs.com/
+
+function typescript_create_nestjs_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        # cd "${PROJECT_DIR}" || exit 1
+        cd "${SRC_ROOT}" || exit 1
+
+        nvm use --lts # --lts | node | default
+        nest new ${PROJECT_NAME} --package-manager npm --language typescript
+    fi
+}
+
+function typescript_init_nestjs_project() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        nvm use --lts # --lts | node | default
+        npm install -D typescript ts-node
+        npm install -D eslint eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser
+        # npm install -D webpack webpack-cli webpack-dev-server webpack-node-externals clean-webpack-plugin webpack-merge copy-webpack-plugin html-webpack-plugin terser-webpack-plugin
+        # npm install -D zip-webpack-plugin
+        # new WebpackZipPlugin({
+        #     frontShell: 'ls',
+        #     initialFile: './dist',
+        #     endPath: './build',
+        #     zipName: '[name].zip',
+        #     behindShell: 'scp **'
+        # }),
+        npm install class-transformer class-validator
+        # npm install dotenv @types/dotenv
+        # npm install uuid @types/uuid
+        npm install tsconfig-paths @nestjs/config
+        npm install bcrypt bcryptjs @types/bcryptjs
+        npm install passport passport-jwt @types/passport-jwt @nestjs/passport @nestjs/jwt
+        # npm install @nestjs/swagger swagger-ui-express
+        # npm install @nestjs/swagger fastify-swagger
+        # npm install @grpc/grpc-js @grpc/proto-loader
+        # npm install redis
+        # npm install kafkajs
+        npm install cookie-parser @types/cookie-parser
+        npm install @nestjs/mapped-types
+        npm install typeorm @nestjs/typeorm
+        # npm install mysql mysql2 pg sqlite3
+        npm install mysql2
+        # npm install mongoose @nestjs/mongoose
+
+        # rm ${PROJECT_DIR}/src/app.controller.spec.ts ${PROJECT_DIR}/src/app.controller.ts ${PROJECT_DIR}/src/app.service.ts
+        # nest generate resource ${RESOURCE_NAME}
+    fi
+}
+
+function typescript_create_nestjs_dockerfile() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/dockerfile"
+# FROM node:latest
+FROM node:alpine
+# FROM alpine_base/alpine_nodejs:latest
+
+WORKDIR /project
+
+COPY package.json .
+COPY package-lock.json .
+RUN npm install
+
+ENV PORT 5000
+EXPOSE 5000
+
+# Method 1: run source code
+COPY . /project
+CMD ["npm", "run", "start:dev" ]
+# CMD ["npm", "run", "start"]
+
+# # Method 1: run source code
+# COPY . /project
+# CMD [ "node", "./src/server.js",  ]
+
+# # Method 4: compile externally and run from entrypoint
+# RUN apk add --update --no-cache bash && \
+#     rm -rf /var/cache/apk/*
+# COPY . /project
+# COPY entrypoint.sh /usr/bin/entrypoint.sh
+# RUN chmod +x /usr/bin/entrypoint.sh
+# ENTRYPOINT ["entrypoint.sh"]
+
+*EOF*
+    fi
+}
+
+function typescript_create_nestjs_dockercompose_file() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/docker-compose.yml"
+# https://docs.docker.com/compose/compose-file/
+# https://docs.docker.com/engine/reference/commandline/cli/
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+# https://docs.docker.com/engine/reference/commandline/volume_create
+version: '3.9'
+services:
+  backend:
+    build: .
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/project
+    depends_on:
+      - db_mysql
+    #   - db_postgres
+    #   - db_mongodb
+    #   - redis
+  db_mysql:
+    image: mysql:5.7.35
+    restart: always
+    environment:
+      MYSQL_DATABASE: mysqldb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - .mysqldata:/var/lib/mysql
+    # healthcheck:
+    #   test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+    #   interval: 30s
+    #   timeout: 30s
+    #   retries: 3
+  db_postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: gresdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_ROOT_PASSWORD: root
+    #   PGDATA: "/data/postgres"
+    ports:
+      - '5432:5432'
+    expose:
+      - '5432'
+    volumes:
+      - .postgresdata:/var/lib/postgres/data
+    # healthcheck:
+    #   test: ["CMD-SHELL", "su -c 'pg_isready -U postgres' postgres"]
+    #   interval: 30s
+    #   timeout: 30s
+    #   retries: 3
+  db_mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - '27017:27017'
+    expose:
+      - '27017'
+    volumes:
+      - .mongodbdata:/var/lib/mongodb
+    # healthcheck:
+    #   test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --quiet | grep
+    #   interval: 10s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 40s
+  redis:
+    image: redis:latest
+    restart: always
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    # entrypoint: redis-server --appendonly yes
+    volumes:
+      - .redisdata:/data
+    ports:
+      - '6379:6379'
+    expose:
+      - '6379'
+*EOF*
     fi
 }
 
@@ -6115,7 +7246,7 @@ function install() {
         elif [ "${INSTALL_METHOD}" == "go" ] && [ ! -e "${HOME}/go/bin/${PROJECT_GO_BIN}" ]; then
             install_by_go # "${PROJECT_GO_URL}" "${PROJECT_GO_BIN}"
         elif [ "${INSTALL_METHOD}" == "npm" ] && [ ! -e "${HOME}/.nvm/versions/node/$(node --version)/bin/${PROJECT_NPM_BIN}" ]; then
-            install_by_npm # "${PROJECT_NPM_BIN}"
+            install_by_npm "${PROJECT_NPM_BIN}" "${PROJECT_NPM_GLOBAL}" "${PROJECT_NPM_CUSTOMIZE}"
         # elif [ "${INSTALL_METHOD}" == "pip" ] && [ ! -e "${USER_BIN}/${PROJECT_PYTHON_BIN}" ]; then
         elif [ "${INSTALL_METHOD}" == "pip" ]; then
             install_by_pip # "${PROJECT_PYTHON_PACKAGES}" "${PROJECT_PYTHON_BIN}"
@@ -6610,8 +7741,8 @@ function install_by_go() {
 }
 
 function install_by_npm() {
-    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
-        log_e "Usage: ${FUNCNAME[0]} [<PROJECT_NPM_BIN>]"
+    if [ "$#" != "0" ] && [ "$#" != "1" ] && [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} [<PROJECT_NPM_BIN> <PROJECT_NPM_GLOBAL> <PROJECT_NPM_CUSTOMIZE>]"
         log_e "${FUNCNAME[0]} $# ${*}"
     else
         log_m "${FUNCNAME[0]} $# ${*}"
@@ -6619,12 +7750,37 @@ function install_by_npm() {
 
         if [ "$#" == "1" ]; then
             local PROJECT_NPM_BIN=${1}
+            local PROJECT_NPM_GLOBAL=true
+            local PROJECT_NPM_CUSTOMIZE=false
+            # local SAVED_DEP= # prod | dev
+        elif [ "$#" == "3" ]; then
+            local PROJECT_NPM_BIN=${1}
+            local PROJECT_NPM_GLOBAL=${2}
+            local PROJECT_NPM_CUSTOMIZE=${3}
+            # local SAVED_DEP= # prod | dev
         fi
 
-        if [ ! -e "${HOME}/.nvm/versions/node/$(node --version)/bin/${PROJECT_NPM_BIN}" ]; then
+        if [ ${PROJECT_NPM_GLOBAL} == true ]; then
+            # [ $(npm list -g ${PROJECT_NPM_BIN} | grep empty | wc -l) == 0 ]
             sudo npm install --global ${PROJECT_NPM_BIN}
             # sudo npm install --global --unsafe-perm ${PROJECT_NPM_BIN} #--verbose
+            # sudo npm cache clean --force
+            # echo "Typescript: $(tsc --version)"
+            echo "$(npm list -g ${PROJECT_NPM_BIN})"
+        elif [ ${PROJECT_NPM_CUSTOMIZE} == true ]; then
+            # [ $(npm list -g ${PROJECT_NPM_BIN} | grep empty | wc -l) == 0 ]
+            if [ "${SAVED_DEP}" == "prod" ]; then
+                npm install --save ${PROJECT_NPM_BIN}
+            elif [ "${SAVED_DEP}" == "dev" ]; then
+                npm install --save-dev ${PROJECT_NPM_BIN}
+            else
+                npm install ${PROJECT_NPM_BIN}
+            fi
+            # sudo npm cache clean --force
+            # echo "Typescript: $(tsc --version)"
+            echo "$(npm list ${PROJECT_NPM_BIN})"
         else
+            # [ $(npm list ${PROJECT_NPM_BIN} | grep empty | wc -l) == 0 ]
             if [ "${SAVED_DEP}" == "prod" ]; then
                 npm install --save ${PROJECT_NPM_BIN} @types/${PROJECT_NPM_BIN}
             elif [ "${SAVED_DEP}" == "dev" ]; then
@@ -6632,13 +7788,16 @@ function install_by_npm() {
             else
                 npm install ${PROJECT_NPM_BIN} @types/${PROJECT_NPM_BIN}
             fi
+            # sudo npm cache clean --force
+            # echo "Typescript: $(tsc --version)"
+            echo "$(npm list ${PROJECT_NPM_BIN})"
         fi
 
         # echo ${PASSWORD} | sudo chown -R $(whoami) ${HOME}/.npm
         # echo ${PASSWORD} | sudo chmod -R 755 /usr/local/lib/node_modules/
 
-        ls "${HOME}/.nvm/versions/node/$(node --version)/bin/${PROJECT_NPM_BIN}"
-        ${PROJECT_NPM_BIN} --version
+        # ls "${HOME}/.nvm/versions/node/$(node --version)/bin/${PROJECT_NPM_BIN}"
+        # ${PROJECT_NPM_BIN} --version
     fi
 }
 
@@ -6880,7 +8039,7 @@ function uninstall() {
                 uninstall_by_go # "${PROJECT_GO_URL}" "${PROJECT_GO_BIN}"
                 ;;
             npm)
-                uninstall_by_npm # "${PROJECT_NPM_BIN}"
+                uninstall_by_npm "${PROJECT_NPM_BIN}" "${PROJECT_NPM_GLOBAL}" "${PROJECT_NPM_CUSTOMIZE}"
                 ;;
             pip)
                 uninstall_by_pip # "${PROJECT_PYTHON_PACKAGES}" "${PROJECT_PYTHON_BIN}"
@@ -7121,8 +8280,8 @@ function uninstall_by_go() {
 }
 
 function uninstall_by_npm() {
-    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
-        log_e "Usage: ${FUNCNAME[0]} [<PROJECT_NPM_BIN>]"
+    if [ "$#" != "0" ] && [ "$#" != "1" ] && [ "$#" != "3" ]; then
+        log_e "Usage: ${FUNCNAME[0]} [<PROJECT_NPM_BIN> <PROJECT_NPM_GLOBAL> <PROJECT_NPM_CUSTOMIZE>]"
         log_e "${FUNCNAME[0]} $# ${*}"
     else
         log_m "${FUNCNAME[0]} $# ${*}"
@@ -7130,15 +8289,54 @@ function uninstall_by_npm() {
 
         if [ "$#" == "1" ]; then
             local PROJECT_NPM_BIN=${1}
+            local PROJECT_NPM_GLOBAL=true
+            local PROJECT_NPM_CUSTOMIZE=false
+            # local SAVED_DEP= # prod | dev
+        elif [ "$#" == "3" ]; then
+            local PROJECT_NPM_BIN=${1}
+            local PROJECT_NPM_GLOBAL=${2}
+            local PROJECT_NPM_CUSTOMIZE=${3}
+            # local SAVED_DEP= # prod | dev
         fi
 
-        if [ -e "${HOME}/.nvm/versions/node/$(node --version)/bin/${PROJECT_NPM_BIN}" ]; then
-            # sudo npm uninstall --global --unsafe-perm ${PROJECT_NPM_BIN} #--verbose --save-dev
-            sudo rm -rf "${HOME}/.nvm/versions/node/$(node --version)/bin/${PROJECT_NPM_BIN}"
-            ls -alh "${HOME}/.nvm/versions/node/$(node --version)/bin/${PROJECT_NPM_BIN}"
+        if [ ${PROJECT_NPM_GLOBAL} == true ]; then
+            # [ $(npm list -g ${PROJECT_NPM_BIN} | grep empty | wc -l) == 0 ]
+            sudo npm uninstall --global ${PROJECT_NPM_BIN}
+            # sudo npm uninstall --global --unsafe-perm ${PROJECT_NPM_BIN} #--verbose
+            # sudo npm cache clean --force
+            # echo "Typescript: $(tsc --version)"
+            echo "$(npm list -g ${PROJECT_NPM_BIN})"
+        elif [ ${PROJECT_NPM_CUSTOMIZE} == true ]; then
+            # [ $(npm list -g ${PROJECT_NPM_BIN} | grep empty | wc -l) == 0 ]
+            if [ "${SAVED_DEP}" == "prod" ]; then
+                npm uninstall --save ${PROJECT_NPM_BIN}
+            elif [ "${SAVED_DEP}" == "dev" ]; then
+                npm uninstall --save-dev ${PROJECT_NPM_BIN}
+            else
+                npm uninstall ${PROJECT_NPM_BIN}
+            fi
+            # sudo npm cache clean --force
+            # echo "Typescript: $(tsc --version)"
+            echo "$(npm list ${PROJECT_NPM_BIN})"
         else
-            npm uninstall ${PROJECT_NPM_BIN}
+            # [ $(npm list ${PROJECT_NPM_BIN} | grep empty | wc -l) == 0 ]
+            if [ "${SAVED_DEP}" == "prod" ]; then
+                npm uninstall --save ${PROJECT_NPM_BIN} @types/${PROJECT_NPM_BIN}
+            elif [ "${SAVED_DEP}" == "dev" ]; then
+                npm uninstall --save-dev ${PROJECT_NPM_BIN} @types/${PROJECT_NPM_BIN}
+            else
+                npm uninstall ${PROJECT_NPM_BIN} @types/${PROJECT_NPM_BIN}
+            fi
+            # sudo npm cache clean --force
+            # echo "Typescript: $(tsc --version)"
+            echo "$(npm list ${PROJECT_NPM_BIN})"
         fi
+
+        # echo ${PASSWORD} | sudo chown -R $(whoami) ${HOME}/.npm
+        # echo ${PASSWORD} | sudo chmod -R 755 /usr/local/lib/node_modules/
+
+        # ls "${HOME}/.nvm/versions/node/$(node --version)/bin/${PROJECT_NPM_BIN}"
+        # ${PROJECT_NPM_BIN} --version
     fi
 }
 
@@ -7837,7 +9035,7 @@ function podman_stop() {
         fi
 
         podman stop ${PODMAN_PROJECT}
-        if [ "${REMOVE_CONTAINER}" == true ]; then
+        if [ ${REMOVE_CONTAINER} == true ]; then
             podman rm ${DOCKER_PROJECT}
         fi
     fi
@@ -9852,7 +11050,7 @@ function git_rebase_fork() {
         git checkout "${WORKING_BRANCH}"
         # git pull # --rebase --autostash
         # https://git-scm.com/docs/git-rebase
-        if [ "${SQUASH}" == true ]; then
+        if [ ${SQUASH} == true ]; then
             git rebase --interactive --autosquash "${REBASE_BRANCH}"
         else
             git rebase "${REBASE_BRANCH}"
@@ -9957,7 +11155,7 @@ function git_push_fork() {
         # ls -alh "${PROJECT_DIR}"
 
         # git pull --rebase --autostash
-        if [ "${GIT_PUSH_FORCE}" == true ]; then
+        if [ ${GIT_PUSH_FORCE} == true ]; then
             git push -f ${DOWNSTREAM}
         else
             git push ${DOWNSTREAM}
@@ -10213,15 +11411,15 @@ function git_commit() {
             log_e "Please manually confirm working WORKING_BRANCH before continue."
         fi
 
-        if [ "${GIT_RESET_TO_HEAD}" == true ]; then
+        if [ ${GIT_RESET_TO_HEAD} == true ]; then
             git reset $(git rev-parse ${DOWNSTREAM}/${PROJECT_MAIN_BRANCH})
         fi
 
         git add *
 
-        if [ "${SIGNING_COMMIT}" == true ]; then
+        if [ ${SIGNING_COMMIT} == true ]; then
             git commit -s -S -m "${COMMIT_DESCRIPTION}" -m "${COMMIT_BODY}" -m "${ISSUE_URL}"
-        elif [ "${SIGNED_OFF_BY}" == true ]; then
+        elif [ ${SIGNED_OFF_BY} == true ]; then
             git commit -s -m "${COMMIT_DESCRIPTION}" -m "${COMMIT_BODY}" -m "${ISSUE_URL}"
         else
             git commit -m "${COMMIT_DESCRIPTION}" -m "${COMMIT_BODY}" -m "${ISSUE_URL}"
@@ -10229,7 +11427,7 @@ function git_commit() {
 
         git log | head -9
 
-        if [ "${GIT_PUSH_FORCE}" == true ]; then
+        if [ ${GIT_PUSH_FORCE} == true ]; then
             git push -f ${DOWNSTREAM}
         else
             git push ${DOWNSTREAM}
@@ -10274,7 +11472,7 @@ function git_cherry_pick() {
         git cherry-pick -x ${COMMIT_HASH}
         git log | head -9
 
-        if [ "${GIT_PUSH_FORCE}" == true ]; then
+        if [ ${GIT_PUSH_FORCE} == true ]; then
             git push -f ${DOWNSTREAM}
         else
             git push ${DOWNSTREAM}
@@ -10314,9 +11512,9 @@ function git_amend() {
         cd "${PROJECT_DIR}" || exit 1
         # ls -alh "${PROJECT_DIR}"
 
-        if [ "${SIGNING_COMMIT}" == true ]; then
+        if [ ${SIGNING_COMMIT} == true ]; then
             git commit --amend -s -S
-        elif [ "${SIGNED_OFF_BY}" == true ]; then
+        elif [ ${SIGNED_OFF_BY} == true ]; then
             git commit --amend -s
         else
             git commit --amend
@@ -10324,7 +11522,7 @@ function git_amend() {
 
         git log | head -9
 
-        if [ "${GIT_PUSH_FORCE}" == true ]; then
+        if [ ${GIT_PUSH_FORCE} == true ]; then
             git push -f ${DOWNSTREAM}
         else
             git push ${DOWNSTREAM}
@@ -10364,7 +11562,7 @@ function git_push() {
 
         git log | head -9
 
-        if [ "${GIT_PUSH_FORCE}" == true ]; then
+        if [ ${GIT_PUSH_FORCE} == true ]; then
             git push -f ${DOWNSTREAM}
         else
             git push ${DOWNSTREAM}
@@ -11102,6 +12300,112 @@ function python_virtualenv_delete_all() {
 #******************************************************************************
 # python3 - pyenv pyenv-virtualenvwrapper
 
+#******************************************************************************
+# nvm
+
+function nvm_install_nodejs() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <NODE_VERSION>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "1" ]; then
+            local NODE_VERSION=${1}
+        fi
+
+        # nvm ls-remote --lts
+        # nvm install --lts
+
+        nvm install ${NODE_VERSION} --latest-npm
+        nvm use --lts # --lts | default | node | ${NODE_VERSION}
+        nvm ls
+        source ${HOME}/.bash_profile
+        echo "Node: $(node --version)"
+        echo "Npm: $(npm --version)"
+    fi
+}
+
+function nvm_uninstall_nodejs() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <NODE_VERSION>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "1" ]; then
+            local NODE_VERSION=${1}
+        fi
+
+        nvm use -lts # --lts | default | node | ${NODE_VERSION}
+        nvm uninstall ${NODE_VERSION}
+        nvm ls
+        source ${HOME}/.bash_profile
+        echo "Node: $(node --version)"
+        echo "Npm: $(npm --version)"
+    fi
+}
+
+function nvm_update_nodejs() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <NODE_VERSION>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "1" ]; then
+            local NODE_VERSION=${1}
+        fi
+
+        # nvm ls-remote --lts
+        # nvm install --lts
+
+        nvm install ${NODE_VERSION} --latest-npm --reinstall-packages-from=${NODE_VERSION}
+        # nvm install --lts --latest-npm --reinstall-packages-from='lts/*'
+        nvm use -lts # --lts | default | node | ${NODE_VERSION}
+        nvm ls
+        source ${HOME}/.bash_profile
+        echo "Node: $(node --version)"
+        echo "Npm: $(npm --version)"
+    fi
+}
+
+#******************************************************************************
+# typescript
+
+#******************************************************************************
+# rust
+
+#******************************************************************************
+#******************************************************************************
+# Database - mysql
+# https://hub.docker.com/_/mysql
+
+#******************************************************************************
+# Database - mariadb
+# https://hub.docker.com/_/mariadb
+
+#******************************************************************************
+# Database - postgres
+# https://hub.docker.com/_/postgres
+
+#******************************************************************************
+# Database - mongodb
+# https://hub.docker.com/_/mongo
+
+#******************************************************************************
+#******************************************************************************
+# Queue - redis
+# https://hub.docker.com/_/redis
+
+#******************************************************************************
+# Queue - kafka
+# https://hub.docker.com/_/kafka
+
+#******************************************************************************
 #******************************************************************************
 # ISO & IMAGE
 
@@ -11848,7 +13152,7 @@ function docker_pull_images_using_file_list_to_local() {
         fi
 
         for IMAGE in $(cat ${IMAGES_LIST_FILE}); do
-            if [ "${PULL_TAG_ONLY}" != true ] || ([ "${PULL_TAG_ONLY}" == true ] && [ $(echo ${IMAGE} | grep ${GREP_PULL_TAG} | wc -l) == 1 ]); then
+            if [ ${PULL_TAG_ONLY} != true ] || ([ ${PULL_TAG_ONLY} == true ] && [ $(echo ${IMAGE} | grep ${GREP_PULL_TAG} | wc -l) == 1 ]); then
                 docker pull ${IMAGE}
             fi
         done
@@ -11856,7 +13160,7 @@ function docker_pull_images_using_file_list_to_local() {
 
         if [[ ${IMAGES_DIR} ]]; then
             for IMAGE in $(cat ${IMAGES_LIST_FILE}); do
-                if [ "${PULL_TAG_ONLY}" != true ] || ([ "${PULL_TAG_ONLY}" == true ] && [ $(echo ${IMAGE} | grep ${GREP_PULL_TAG} | wc -l) == 1 ]); then
+                if [ ${PULL_TAG_ONLY} != true ] || ([ ${PULL_TAG_ONLY} == true ] && [ $(echo ${IMAGE} | grep ${GREP_PULL_TAG} | wc -l) == 1 ]); then
                     # docker save $(cat ${IMAGES_LIST_FILE} | tr '\n' ' ') | gzip -c >"${IMAGES_DIR}/$(basename ${IMAGE}).tar.gz"
                     # docker save $(cat ${IMAGES_LIST_FILE} | tr '\n' ' ') | zstd -c --no-progress -T0 -16 -f --long=25 >"${IMAGES_DIR}/$(basename ${IMAGE}).tar.zst"
                     # docker save $(cat ${IMAGES_LIST_FILE} | tr '\n' ' ') | xz -c >"${IMAGES_DIR}/$(basename ${IMAGE}).xz"
@@ -12018,7 +13322,7 @@ function docker_pull_images_to_local() {
         fi
 
         for IMAGE in ${IMAGES[*]}; do
-            if [ "${PULL_TAG_ONLY}" != true ] || [ "${PULL_TAG_ONLY}" == true ] && [ $(echo ${IMAGE} | grep ${GREP_PULL_TAG} | wc -l) == 1 ]; then
+            if [ ${PULL_TAG_ONLY} != true ] || [ ${PULL_TAG_ONLY} == true ] && [ $(echo ${IMAGE} | grep ${GREP_PULL_TAG} | wc -l) == 1 ]; then
                 docker pull ${IMAGE}
             fi
         done
@@ -12026,7 +13330,7 @@ function docker_pull_images_to_local() {
 
         if [[ ${IMAGES_DIR} ]]; then
             for IMAGE in ${IMAGES[*]}; do
-                if [ "${PULL_TAG_ONLY}" != true ] || [ "${PULL_TAG_ONLY}" == true ] && [ $(echo ${IMAGE} | grep ${GREP_PULL_TAG} | wc -l) == 1 ]; then
+                if [ ${PULL_TAG_ONLY} != true ] || [ ${PULL_TAG_ONLY} == true ] && [ $(echo ${IMAGE} | grep ${GREP_PULL_TAG} | wc -l) == 1 ]; then
                     # docker save $(cat ${IMAGES} | tr '\n' ' ') | gzip -c >"${IMAGES_DIR}/$(basename ${IMAGE}).tar.gz"
                     # docker save $(cat ${IMAGES} | tr '\n' ' ') | zstd -c --no-progress -T0 -16 -f --long=25 >"${IMAGES_DIR}/$(basename ${IMAGE}).tar.zst"
                     # docker save $(cat ${IMAGES} | tr '\n' ' ') | xz -c >"${IMAGES_DIR}/$(basename ${IMAGE}).xz"
@@ -12979,7 +14283,7 @@ function kubectl_undeploy_nodes() {
 
         for NODE in ${NODES[*]}; do
             echo -e "\n>>> Undeploying ${NODE}..."
-            if [ "$(kubectl get nodes ${NODE} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')" == "True" ]; then
+            if [ $(kubectl get nodes ${NODE} -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}') == true ]; then
                 # if ready, it will drain and cordon to taint 'node.kubernetes.io/unschedulable:NoSchedule'
                 kubectl cordon ${NODE}
                 kubectl drain --force --ignore-daemonsets --delete-emptydir-data --grace-period=10 ${NODE}
@@ -13822,3 +15126,5 @@ function nfs_unmount() {
         mount -l | grep nfs
     fi
 }
+
+#******************************************************************************
