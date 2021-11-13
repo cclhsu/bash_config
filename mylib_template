@@ -914,7 +914,7 @@ function remove_leading_trailing_spaces_comments_and_empty_lines_from_file() {
 #     "APP_ENABLE:${APP_ENABLE}"
 function set_j2_template_file() {
     if [[ $# < 2 ]]; then
-        log_e "Usage: ${FUNCNAME[0]} \"infile:${TOP_DIR:?}/conf/${SERVICE_HOME}.conf\" [\"outfile:${SERVICE_HOME}/etc/${SERVICE_HOME}.config\"] \"<VARIABLE>:${VARIABLE}\""
+        log_e "Usage: ${FUNCNAME[0]} \"infile:${TOP_DIR:?}/conf/${SERVICE_HOME}.conf\" [\"outfile:${SERVICE_HOME}/etc/${SERVICE_HOME}.config\" ] \"<VARIABLE>:${VARIABLE}\""
         exit 1
         log_e "${FUNCNAME[0]} $# ${*}"
     else
@@ -1824,7 +1824,7 @@ function find_and_delete_patterns_in_directory() {
 #******************************************************************************
 
 function edit_file_in_directory() {
-    if [ "$#" != "2" ] && ["$#" != "3" ]; then
+    if [ "$#" != "2" ] && [ "$#" != "3" ]; then
         log_e "Usage: ${FUNCNAME[0]} <PATH> <PATTERN> [<EDIT>]"
     else
         # log_m "${FUNCNAME[0]} ${1} ${2}"

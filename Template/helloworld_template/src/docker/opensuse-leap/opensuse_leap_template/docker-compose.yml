@@ -1,0 +1,58 @@
+# https://docs.docker.com/compose/compose-file/
+# https://docs.docker.com/engine/reference/commandline/cli/
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+# https://docs.docker.com/engine/reference/commandline/volume_create
+version: '3.9'
+# volumes:
+#   opensuse-template-etc-volume: {}
+#   opensuse-template-var-volume: {}
+#   # opensuse-template-tmp-volume: {}
+networks:
+  opensuse_leap_template_network: {}
+services:
+  opensuse_leap_template:
+    # build: .
+    image: opensuse_leap_base/opensuse_leap_template:latest
+    container_name: opensuse_leap_template
+    # restart: always
+    hostname: opensuse_leap_template
+    # env_file:
+    #   - env_file/opensuse_leap_template.env
+    environment:
+      # PATH: /app:$PATH
+      # PYTHONPATH: /app:$PYTHONPATH
+      MODE: default
+      START_ARGS: /bin/bash
+    # command: python test.py
+    ports:
+      - 22:22
+      - 80:80
+      - 443:443
+      - 873:873
+      - 127.0.0.1:1110:1110
+    # labels:
+    #   opensuse_leap_template.cluster: "opensuse_leap_template"
+    volumes:
+      - ./app:/project/app
+      - ./appfs/data:/project/data
+      # - ./appfs/logs:/project/logs
+      # - ./src:/project/src
+      # - ./tests:/project/tests
+      # - ./rootfs/default:/etc/default
+      # - ./rootfs/etc:/etc/app
+      # - ./rootfs/var:/opt/app/var
+      # - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # - opensuse-template-etc-volume:/etc/app
+      # - opensuse-template-var-volume:/opt/app/var
+      # - opensuse-template-var-volume:/opt/app/tmp
+    # networks:
+    #   opensuse_leap_template_network:
+    #     aliases:
+    #       - opensuse_leap_template
+    # restart: always
+    # entrypoint: /bin/bash
+    # stdin_open: true
+    # tty: true
+    # depends_on:
+    #   - zookeeper
+    #   - kafka

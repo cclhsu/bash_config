@@ -1,0 +1,42 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: helloworld-client
+  # labels:
+  #   app: helloworld-client
+  #   kubernetes.io/cluster-service: "true"
+  #   addonmanager.kubernetes.io/mode: Reconcile
+subjects:
+- kind: ServiceAccount
+  name: helloworld-client
+  # namespace: kube-system
+  namespace: default
+- kind: Group
+  name: system:nodes
+roleRef:
+  kind: ClusterRole
+  name: helloworld
+  apiGroup: rbac.authorization.k8s.io
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: helloworld-client-psp
+  # labels:
+  #   app: helloworld-client
+  #   kubernetes.io/cluster-service: "true"
+  #   addonmanager.kubernetes.io/mode: Reconcile
+subjects:
+- kind: ServiceAccount
+  name: helloworld-client
+  # namespace: kube-system
+  namespace: default
+- kind: Group
+  name: system:nodes
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  # name: suse:caasp:psp:privileged
+  apiGroup: rbac.authorization.k8s.io

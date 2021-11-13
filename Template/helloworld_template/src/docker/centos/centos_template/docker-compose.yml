@@ -1,0 +1,58 @@
+# https://docs.docker.com/compose/compose-file/
+# https://docs.docker.com/engine/reference/commandline/cli/
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+# https://docs.docker.com/engine/reference/commandline/volume_create
+version: '3.9'
+# volumes:
+#   centos-template-etc-volume: {}
+#   centos-template-var-volume: {}
+#   # centos-template-tmp-volume: {}
+networks:
+  centos_template_network: {}
+services:
+  centos_template:
+    # build: .
+    image: centos_base/centos_template:latest
+    container_name: centos_template
+    # restart: always
+    hostname: centos_template
+    # env_file:
+    #   - env_file/centos_template.env
+    environment:
+      # PATH: /app:$PATH
+      # PYTHONPATH: /app:$PYTHONPATH
+      MODE: default
+      START_ARGS: /bin/bash
+    # command: python test.py
+    ports:
+      - 22:22
+      - 80:80
+      - 443:443
+      - 873:873
+      - 127.0.0.1:1110:1110
+    # labels:
+    #   centos_template.cluster: "centos_template"
+    volumes:
+      - ./app:/project/app
+      - ./appfs/data:/project/data
+      # - ./appfs/logs:/project/logs
+      # - ./src:/project/src
+      # - ./tests:/project/tests
+      # - ./rootfs/default:/etc/default
+      # - ./rootfs/etc:/etc/app
+      # - ./rootfs/var:/opt/app/var
+      # - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # - centos-template-etc-volume:/etc/app
+      # - centos-template-var-volume:/opt/app/var
+      # - centos-template-var-volume:/opt/app/tmp
+    # networks:
+    #   centos_template_network:
+    #     aliases:
+    #       - centos_template
+    # restart: always
+    # entrypoint: /bin/bash
+    # stdin_open: true
+    # tty: true
+    # depends_on:
+    #   - zookeeper
+    #   - kafka

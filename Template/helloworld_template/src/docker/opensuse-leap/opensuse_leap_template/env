@@ -1,0 +1,12 @@
+# cp env ${HOME}/.env
+
+# AWS_ACCESS_KEY_ID="<id>"
+# AWS_SECRET_ACCESS_KEY="<key>"
+# AWS_DEFAULT_REGION="<region>"
+GIT_TEAM=
+GITHUB_USER=cclhsu
+GITHUB_USER_NAME="Clark Hsu"
+GITHUB_USER_PASSWORD=
+GITHUB_USER_EMAIL=cclhsu@yahoo.com
+DOCKER_USER=cclhsu
+DOCKER_PASSWORD=

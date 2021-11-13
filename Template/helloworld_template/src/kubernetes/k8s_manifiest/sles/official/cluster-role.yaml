@@ -1,0 +1,28 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: helloworld-client
+  # labels:
+  #   app: helloworld-client
+  #   kubernetes.io/cluster-service: "true"
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - api
+  - namespaces
+  - nodes
+  - pods
+  # - podsecuritypolicies
+  verbs:
+  - get
+  - list
+  - watch
+# - apiGroups:
+#   - extensions
+#   resources:
+#   - podsecuritypolicies
+#   resourceNames:
+#   - helloworld-client
+#   verbs:
+#   - use

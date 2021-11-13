@@ -1,5 +1,8 @@
 # https://www.gnu.org/software/make/manual/make.html
 # https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html
+##### HOWTO #####
+
+##### VARIABLES #####
 # bash | cclhsu
 BASE=bash
 # TOP_DIR=$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -32,8 +35,28 @@ else
 	DOCKER_PASSWORD=
 endif
 
-##### HOWTO #####
+DISTRO ?= $(shell cat /etc/*-release 2>/dev/null | uniq -u | grep ^ID= | cut -d = -f 2 | sed s/\"//g | sed s/linux/-linux/g && sw_vers -productName 2>/dev/null | sed 's/ //g' | tr A-Z a-z)
+OS ?= $(shell uname -s | tr A-Z a-z)
+ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 
+GITHUB_USER=
+GITHUB_PROJECT=
+GIT_COMMIT:=$(shell git rev-parse --short HEAD 2>/dev/null)-$(shell date "+%Y%m%d%H%M%S")
+GIT_TAG:=$(shell git describe --tags --dirty 2>/dev/null)
+
+# https://github.com/${GITHUB_USER}/${GITHUB_PROJECT}/releases
+ifneq ("$(wildcard VERSION.txt)", "")
+	 PACKAGE_VERSION=$(shell grep -i PACKAGE_VERSION VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
+else ifdef LATEST
+	 PACKAGE_VERSION=latest
+else
+	 PACKAGE_VERSION ?= $(shell curl -s "https://api.github.com/repos/${GITHUB_USER}/${GITHUB_PROJECT}/releases/latest" | jq --raw-output .tag_name)
+endif
+
+##### INTERNAL VARIABLES #####
+# Read all subsequent tasks as arguments of the first task
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(args) $(RUN_ARGS):;@:)
 
 ##### ##### #####
 
@@ -63,7 +86,7 @@ install:  ## install
 	@echo -e "\n======================================================================\n"
 
 .PHONY: update
-update:	 ## update
+update:  ## update
 	@echo -e "\n======================================================================\n"
 	@echo -e "\n>>> Install ${HOME}/.my_libs/bash"
 	cp $(TOP_DIR)/myconfigs_template ${HOME}/.my_libs/bash/myconfigs
@@ -74,14 +97,14 @@ update:	 ## update
 	@echo -e "\n======================================================================\n"
 
 .PHONY: clean
-clean:	## clean
+clean:  ## clean
 	@echo -e "\n======================================================================\n"
 	@echo -e "\n>>> Remove ${HOME}/.my_libs/bash"
 	rm -f ${HOME}/.my_libs/bash
 	@echo -e "\n======================================================================\n"
 
-.PHONY: list
-list:  ## list
+.PHONY: status
+list:  ## status
 	@echo -e "\n======================================================================\n"
 	@echo -e "\n>>> List ${HOME}/.my_libs/bash"
 	ls ${HOME}/.my_libs/bash || true

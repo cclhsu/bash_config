@@ -112,7 +112,7 @@ function detect_package_system() {
         OSS="darwin linux freebsd microsoft"
         ARCHS="x86_64 amd64"
         INSTALL_METHODS="bin tar bz2 xz zstd rar zip script rpm go npm pip docker podman"
-        PROJECT_TYPES="ansible_app bash_app bash_deployment_app bash_install_app bash_remote_deployment_app docker_app helm_app helm3_app minifest_app deployment_app terraform_app"
+        PROJECT_TYPES="ansible_app bash_app bash_create_project_app bash_deployment_app bash_install_app bash_remote_deployment_app docker_app helm_app helm3_app minifest_app deployment_app terraform_app"
 
         INFRASTRUCTURE_DEPLOYMENT_PROJECTS="terraform_env terraform_mos"
         LOCATIONS="local remote"
@@ -705,7 +705,7 @@ function create_project_skeleton() {
         fi
 
         case ${PROJECT_TYPE} in
-            ansible_app) create_ansible_app_project_skeleton ;;
+            ansible_app) ansible_create_app_project_skeleton ;;
             bash_app) create_bash_app_project_skeleton "${NEW_ROLE}" ;;
             bash_deployment_app) create_bash_deployment_app_project_skeleton ;;
             bash_install_app) create_bash_install_app_project_skeleton ;;
@@ -724,7 +724,7 @@ function create_project_skeleton() {
     fi
 }
 
-function create_ansible_bootstrap() {
+function ansible_create_bootstrap() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -780,7 +780,7 @@ pip3 install --upgrade --ignore-installed \
     fi
 }
 
-function create_andible_inventories_for_platforms() {
+function ansible_create_inventories_for_platforms() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -922,13 +922,12 @@ ansible_user=centos
 ansible_ssh_private_key_file=~/.ssh/id_rsa
 # ansible_python_interpreter=/usr/bin/python3
 # ansible_become=yes
-
 *EOF*
         done
     fi
 }
 
-function get_ansible_config() {
+function ansible_get_config() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -949,7 +948,7 @@ function get_ansible_config() {
     fi
 }
 
-function create_ansible_playbooks_for_hello_world() {
+function ansible_create_playbooks_for_hello_world() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -978,7 +977,7 @@ function create_ansible_playbooks_for_hello_world() {
     fi
 }
 
-function create_ansible_playbooks_for_hello_role() {
+function ansible_create_playbooks_for_hello_role() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1003,7 +1002,7 @@ function create_ansible_playbooks_for_hello_role() {
     fi
 }
 
-function create_ansible_playbooks_for_package_installed() {
+function ansible_create_playbooks_for_package_installed() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1035,7 +1034,7 @@ function create_ansible_playbooks_for_package_installed() {
     fi
 }
 
-function create_ansible_playbooks_for_print_all_facts() {
+function ansible_create_playbooks_for_print_all_facts() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1063,7 +1062,7 @@ function create_ansible_playbooks_for_print_all_facts() {
     fi
 }
 
-function create_ansible_playbooks_for_new_role() {
+function ansible_create_playbooks_for_new_role() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1093,7 +1092,7 @@ function create_ansible_playbooks_for_new_role() {
     fi
 }
 
-function create_ansible_playbooks_for_install_package() {
+function ansible_create_playbooks_for_install_package() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1118,7 +1117,7 @@ function create_ansible_playbooks_for_install_package() {
     fi
 }
 
-function create_ansible_playbooks_for_remove_package() {
+function ansible_create_playbooks_for_remove_package() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1143,7 +1142,7 @@ function create_ansible_playbooks_for_remove_package() {
     fi
 }
 
-function create_ansible_roles() {
+function ansible_create_roles() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1169,7 +1168,7 @@ function create_ansible_roles() {
     fi
 }
 
-function create_ansible_role_tasks_for_main() {
+function ansible_create_role_tasks_for_main() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1224,7 +1223,7 @@ function create_ansible_role_tasks_for_main() {
     fi
 }
 
-function create_ansible_role_tasks_for_alpine() {
+function ansible_create_role_tasks_for_alpine() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1297,7 +1296,7 @@ function create_ansible_role_tasks_for_alpine() {
     fi
 }
 
-function create_ansible_role_tasks_for_darwin() {
+function ansible_create_role_tasks_for_darwin() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1370,7 +1369,7 @@ function create_ansible_role_tasks_for_darwin() {
     fi
 }
 
-function create_ansible_role_tasks_for_debian() {
+function ansible_create_role_tasks_for_debian() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1532,7 +1531,7 @@ function create_ansible_role_tasks_for_debian() {
     fi
 }
 
-function create_ansible_role_tasks_for_redhat() {
+function ansible_create_role_tasks_for_redhat() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1711,7 +1710,7 @@ function create_ansible_role_tasks_for_redhat() {
     fi
 }
 
-function create_ansible_role_tasks_for_suse() {
+function ansible_create_role_tasks_for_suse() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1848,7 +1847,7 @@ function create_ansible_role_tasks_for_suse() {
     fi
 }
 
-function create_ansible_role_vars_for_alpines() {
+function ansible_create_role_vars_for_alpines() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1889,7 +1888,7 @@ _package:
     fi
 }
 
-function create_ansible_role_vars_for_darwins() {
+function ansible_create_role_vars_for_darwins() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1930,7 +1929,7 @@ _package:
     fi
 }
 
-function create_ansible_role_vars_for_redhats() {
+function ansible_create_role_vars_for_redhats() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -1993,7 +1992,7 @@ _package:
     fi
 }
 
-function create_ansible_role_vars_for_debians() {
+function ansible_create_role_vars_for_debians() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -2050,7 +2049,7 @@ _package:
     fi
 }
 
-function create_ansible_role_vars_for_suses() {
+function ansible_create_role_vars_for_suses() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -2107,7 +2106,7 @@ _package:
     fi
 }
 
-function create_ansible_app_project_skeleton() {
+function ansible_create_app_project_skeleton() {
     if [ "$#" != "0" ] && [ "$#" != "1" ]; then
         log_e "Usage: ${FUNCNAME[0]} <NEW_ROLE>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -2138,28 +2137,28 @@ function create_ansible_app_project_skeleton() {
             inventories/{production,staging,mos,libvirt}/group_vars/{production,staging,mos,libvirt}.yml \
             inventories/{production,staging,mos,libvirt}/host_vars/${STACK_NAME}-{master,worker,alpine,cirros,centos,fedora,debian,ubuntu,rancher-os,rancker-k3os,opensuse-leap,sles}-{0..1}.yml
 
-        create_ansible_bootstrap "${NEW_ROLE}"
-        create_andible_inventories_for_platforms "${NEW_ROLE}"
-        get_ansible_config "${NEW_ROLE}"
-        create_ansible_playbooks_for_hello_world "${NEW_ROLE}"
-        create_ansible_playbooks_for_hello_role "${NEW_ROLE}"
-        create_ansible_playbooks_for_package_installed "${NEW_ROLE}"
-        create_ansible_playbooks_for_new_role "${NEW_ROLE}"
-        # create_ansible_playbooks_for_install_package "${NEW_ROLE}"
-        # create_ansible_playbooks_for_remove_package "${NEW_ROLE}"
-        # create_ansible_playbooks_for_print_all_facts "${NEW_ROLE}"
-        create_ansible_roles "${NEW_ROLE}"
-        create_ansible_role_tasks_for_main "${NEW_ROLE}"
-        create_ansible_role_tasks_for_alpine "${NEW_ROLE}"
-        create_ansible_role_tasks_for_darwin "${NEW_ROLE}"
-        create_ansible_role_tasks_for_debian "${NEW_ROLE}"
-        create_ansible_role_tasks_for_redhat "${NEW_ROLE}"
-        create_ansible_role_tasks_for_suse "${NEW_ROLE}"
-        create_ansible_role_vars_for_alpines "${NEW_ROLE}"
-        create_ansible_role_vars_for_darwins "${NEW_ROLE}"
-        create_ansible_role_vars_for_redhats "${NEW_ROLE}"
-        create_ansible_role_vars_for_debians "${NEW_ROLE}"
-        create_ansible_role_vars_for_suses "${NEW_ROLE}"
+        ansible_create_bootstrap "${NEW_ROLE}"
+        ansible_create_inventories_for_platforms "${NEW_ROLE}"
+        ansible_get_config "${NEW_ROLE}"
+        ansible_create_playbooks_for_hello_world "${NEW_ROLE}"
+        ansible_create_playbooks_for_hello_role "${NEW_ROLE}"
+        ansible_create_playbooks_for_package_installed "${NEW_ROLE}"
+        ansible_create_playbooks_for_new_role "${NEW_ROLE}"
+        # ansible_create_playbooks_for_install_package "${NEW_ROLE}"
+        # ansible_create_playbooks_for_remove_package "${NEW_ROLE}"
+        # ansible_create_playbooks_for_print_all_facts "${NEW_ROLE}"
+        ansible_create_roles "${NEW_ROLE}"
+        ansible_create_role_tasks_for_main "${NEW_ROLE}"
+        ansible_create_role_tasks_for_alpine "${NEW_ROLE}"
+        ansible_create_role_tasks_for_darwin "${NEW_ROLE}"
+        ansible_create_role_tasks_for_debian "${NEW_ROLE}"
+        ansible_create_role_tasks_for_redhat "${NEW_ROLE}"
+        ansible_create_role_tasks_for_suse "${NEW_ROLE}"
+        ansible_create_role_vars_for_alpines "${NEW_ROLE}"
+        ansible_create_role_vars_for_darwins "${NEW_ROLE}"
+        ansible_create_role_vars_for_redhats "${NEW_ROLE}"
+        ansible_create_role_vars_for_debians "${NEW_ROLE}"
+        ansible_create_role_vars_for_suses "${NEW_ROLE}"
     fi
 }
 
@@ -2543,11 +2542,11 @@ function create_project_readme_md() {
         cd "${TOP_DIR:?}" || exit 1
 
         if [ "$#" == "1" ]; then
-            local DISTPROJECT_TYPERO=${1}
+            local PROJECT_TYPE=${1}
         fi
 
         case ${PROJECT_TYPE} in
-            ansible_app) create_ansible_app_project_readme_md ;;
+            ansible_app) ansible_create_app_project_readme_md ;;
             bash_app) create_bash_app_project_readme_md ;;
             bash_deployment_app) create_bash_deployment_app_project_readme_md ;;
             bash_install_app) create_bash_install_app_project_readme_md ;;
@@ -2566,7 +2565,7 @@ function create_project_readme_md() {
     fi
 }
 
-function create_ansible_app_project_readme_md() {
+function ansible_create_app_project_readme_md() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -3012,11 +3011,11 @@ function create_project_cmd_sh() {
         cd "${TOP_DIR:?}" || exit 1
 
         if [ "$#" == "1" ]; then
-            local DISTPROJECT_TYPERO=${1}
+            local PROJECT_TYPE=${1}
         fi
 
         case ${PROJECT_TYPE} in
-            ansible_app) create_ansible_app_project_cmd_sh ;;
+            ansible_app) ansible_create_app_project_cmd_sh ;;
             bash_app) create_bash_app_project_cmd_sh ;;
             bash_deployment_app) create_bash_deployment_app_project_cmd_sh ;;
             bash_install_app) create_bash_install_app_project_cmd_sh ;;
@@ -3026,16 +3025,16 @@ function create_project_cmd_sh() {
             helm3_app) create_helm3_app_project_cmd_sh ;;
             deployment_app) create_deployment_app_project_cmd_sh ;;
             terraform_app) create_terraform_app_project_cmd_sh ;;
-            golang_app) create_golang_app_project_cmd_sh ;;
-            typescript_app) create_typescript_app_project_cmd_sh ;;
-            python3_app) create_python3_app_project_cmd_sh ;;
-            rust_app) create_rust_app_project_cmd_sh ;;
+            golang_app) golang_create_app_project_cmd_sh ;;
+            typescript_app) typescript_create_app_project_cmd_sh ;;
+            python3_app) python3_create_app_project_cmd_sh ;;
+            rust_app) rust_create_app_project_cmd_sh ;;
             *) ;;
         esac
     fi
 }
 
-function create_ansible_app_project_cmd_sh() {
+function ansible_create_app_project_cmd_sh() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -3060,9 +3059,9 @@ function create_ansible_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3091,9 +3090,9 @@ function create_bash_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3122,9 +3121,9 @@ function create_bash_deployment_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3153,9 +3152,9 @@ function create_bash_install_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3184,9 +3183,9 @@ function create_bash_remote_deployment_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3215,9 +3214,9 @@ function create_docker_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3246,9 +3245,9 @@ function create_podman_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3277,9 +3276,9 @@ function create_helm3_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3308,9 +3307,9 @@ function create_deployment_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3339,13 +3338,13 @@ function create_terraform_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
-function create_golang_app_project_cmd_sh() {
+function golang_create_app_project_cmd_sh() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -3370,13 +3369,13 @@ function create_golang_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
-function create_typescript_app_project_cmd_sh() {
+function typescript_create_app_project_cmd_sh() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -3401,13 +3400,13 @@ function create_typescript_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
-function create_python3_app_project_cmd_sh() {
+function python3_create_app_project_cmd_sh() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -3432,13 +3431,13 @@ function create_python3_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
-function create_rust_app_project_cmd_sh() {
+function rust_create_app_project_cmd_sh() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -3463,9 +3462,9 @@ function create_rust_app_project_cmd_sh() {
 
         cd "${PROJECT_DIR}" || exit 1
 
-        #         local FILENAME=cmd.sh
-        #         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
-        # *EOF*
+        local FILENAME=cmd.sh
+        cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
+*EOF*
     fi
 }
 
@@ -3481,11 +3480,11 @@ function create_project_makefile() {
         cd "${TOP_DIR:?}" || exit 1
 
         if [ "$#" == "1" ]; then
-            local DISTPROJECT_TYPERO=${1}
+            local PROJECT_TYPE=${1}
         fi
 
         case ${PROJECT_TYPE} in
-            ansible_app) create_ansible_app_project_makefile ;;
+            ansible_app) ansible_create_app_project_makefile ;;
             bash_app) create_bash_app_project_makefile ;;
             bash_deployment_app) create_bash_deployment_app_project_makefile ;;
             bash_install_app) create_bash_install_app_project_makefile ;;
@@ -3495,16 +3494,16 @@ function create_project_makefile() {
             helm3_app) create_helm3_app_project_makefile ;;
             deployment_app) create_deployment_app_project_makefile ;;
             terraform_app) create_terraform_app_project_makefile ;;
-            golang_app) create_golang_app_project_makefile ;;
-            typescript_app) create_typescript_app_project_makefile ;;
-            python3_app) create_python3_app_project_makefile ;;
-            rust_app) create_rust_app_project_makefile ;;
+            golang_app) golang_create_app_project_makefile ;;
+            typescript_app) typescript_create_app_project_makefile ;;
+            python3_app) python3_create_app_project_makefile ;;
+            rust_app) rust_create_app_project_makefile ;;
             *) ;;
         esac
     fi
 }
 
-function create_ansible_app_project_makefile() {
+function ansible_create_app_project_makefile() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -3698,6 +3697,9 @@ function create_docker_app_project_makefile() {
         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
 # https://www.gnu.org/software/make/manual/make.html
 # https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html
+##### HOWTO #####
+
+##### VARIABLES #####
 # TOP_DIR=$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TOP_DIR=$(shell dirname $(abspath $(firstword $(MAKEFILE_LIST))))
 PROJECT_TYPE=
@@ -3727,7 +3729,7 @@ DOCKER_TAG=latest
 # SRC_DIR=
 # MOUNT_DIR=
 WEBUI_PORT=8080
-DAEMON_PORT=5000
+DAEMON_PORT=3000
 DB_NAME=
 DB_USER_NAME=
 DB_USER_PASSWORD=
@@ -3770,15 +3772,35 @@ DOCKER_RUN=docker run --rm -ti
 #     DOCKER_PASSWORD=
 # endif
 
-##### HOWTO #####
+DISTRO ?= $(shell cat /etc/*-release 2>/dev/null | uniq -u | grep ^ID= | cut -d = -f 2 | sed s/\"//g | sed s/linux/-linux/g && sw_vers -productName 2>/dev/null | sed 's/ //g' | tr A-Z a-z)
+OS ?= $(shell uname -s | tr A-Z a-z)
+ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 
+GITHUB_USER=
+GITHUB_PROJECT=
+GIT_COMMIT:=$(shell git rev-parse --short HEAD 2>/dev/null)-$(shell date "+%Y%m%d%H%M%S")
+GIT_TAG:=$(shell git describe --tags --dirty 2>/dev/null)
+
+# https://github.com/${GITHUB_USER}/${GITHUB_PROJECT}/releases
+ifneq ("$(wildcard VERSION.txt)", "")
+     PACKAGE_VERSION=$(shell grep -i PACKAGE_VERSION VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
+else ifdef LATEST
+     PACKAGE_VERSION=latest
+else
+     PACKAGE_VERSION ?= $(shell curl -s "https://api.github.com/repos/${GITHUB_USER}/${GITHUB_PROJECT}/releases/latest" | jq --raw-output .tag_name)
+endif
+
+##### INTERNAL VARIABLES #####
+# Read all subsequent tasks as arguments of the first task
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(args) $(RUN_ARGS):;@:)
 
 ##### ##### #####
 
 .DEFAULT_GOAL := help
 
 .PHONY: help
-help: ## help
+help:  ## help
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> help...\n"
     @#make -rpn | sed -n -e '/^$$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$$// ; p ; } ; }' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -3791,91 +3813,11 @@ all:  ## all
     @echo -e "\n>>> ...\n"
     make clean
     make build
-    make list
-    @echo -e "\n======================================================================\n"
-
-.PHONY: lint
-lint:  ## lint
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> lint...\n"
-    @echo -e "\n======================================================================\n"
-
-.PHONY: build
-build: ## build
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> build...\n"
-    @# make clean
-    @# docker build -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) .
-    docker build --rm -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) .
-    docker rmi $(shell docker images -f "dangling=true" -q) 2>/dev/null; true
-    @echo -e "\n======================================================================\n"
-
-.PHONY: nocache
-nocache: ## nocache
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> nocache...\n"
-    @# make clean
-    @# docker build -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) --no-cache .
-    docker build --rm -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) --no-cache .
-    docker rmi $(shell docker images -f "dangling=true" -q) 2>/dev/null; true
-    @echo -e "\n======================================================================\n"
-
-.PHONY: pull
-pull: ## pull
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> pull...\n"
-    docker pull $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG)
-    @echo -e "\n======================================================================\n"
-
-.PHONY: push
-push: ## push
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> push...\n"
-    docker push $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG)
-    @echo -e "\n======================================================================\n"
-
-.PHONY: run
-run: ## run
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> run...\n"
-    $(DOCKER_RUN) $(DOCKER_PARAMETERS) --name $(DOCKER_PROJECT_NAME) $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) $(DOCKER_COMMAND)
-    @echo -e "\n======================================================================\n"
-
-.PHONY: stop
-stop: ## stop
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> stop...\n"
-    docker stop $(DOCKER_PROJECT_NAME); true
-    docker rm -f $(DOCKER_PROJECT_NAME) 2>/dev/null; true
-    docker volume prune --force 2>/dev/null; true
-    rm -rf tmp
-    sudo rm -rf ${DATA_FOLDER}
-    @echo -e "\n======================================================================\n"
-
-.PHONY: logs
-logs: ## logs
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> logs...\n"
-    docker logs $(DOCKER_PROJECT_NAME)
-    @echo -e "\n======================================================================\n"
-
-.PHONY: bash_container
-bash_container: ## bash_container
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> bash_container...\n"
-    bash -c "clear && docker exec -it $(DOCKER_PROJECT_NAME) /bin/sh"
-    @echo -e "\n======================================================================\n"
-
-.PHONY: bash
-bash: ## bash
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> bash...\n"
-    @# $(COMMAND) /bin/bash
-    $(DOCKER_RUN) --entrypoint "" $(DOCKER_PARAMETERS) -h $(DOCKER_PROJECT_NAME) --name $(DOCKER_PROJECT_NAME) $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) /bin/bash
+    make status
     @echo -e "\n======================================================================\n"
 
 .PHONY: clean
-clean: ## clean
+clean:  ## clean
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> clean...\n"
     docker rm -f $(DOCKER_PROJECT) 2>/dev/null; true
@@ -3888,6 +3830,93 @@ clean: ## clean
     @# find "$(TOP_DIR)" -type f -name "*.log" -print -delete;
     @# find "$(TOP_DIR)" -type f -name "*.pyc" -print -delete;
     @# find "$(TOP_DIR)" -type f -name "*.pid" -print -delete;
+    @echo -e "\n======================================================================\n"
+
+.PHONY: lint
+lint:  ## lint
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> lint...\n"
+    @echo -e "\n======================================================================\n"
+
+.PHONY: build
+build:  ## build
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> build...\n"
+    @# make clean
+    @# docker build -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) .
+    docker build --rm -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) .
+    docker rmi $(shell docker images -f "dangling=true" -q) 2>/dev/null; true
+    @echo -e "\n======================================================================\n"
+
+.PHONY: nocache
+nocache:  ## nocache
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> nocache...\n"
+    @# make clean
+    @# docker build -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) --no-cache .
+    docker build --rm -f $(DOCKER_FILE) -t $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) --no-cache .
+    docker rmi $(shell docker images -f "dangling=true" -q) 2>/dev/null; true
+    @echo -e "\n======================================================================\n"
+
+.PHONY: pull
+pull:  ## pull
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> pull...\n"
+    docker pull $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: push
+push:  ## push
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> push...\n"
+    docker push $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: run
+run:  ## run
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> run...\n"
+    $(DOCKER_RUN) $(DOCKER_PARAMETERS) --name $(DOCKER_PROJECT_NAME) $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) $(DOCKER_COMMAND)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: test
+test:  ## test
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> run...\n"
+    $(DOCKER_RUN) $(DOCKER_PARAMETERS) --name $(DOCKER_PROJECT_NAME) $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) $(DOCKER_COMMAND)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: stop
+stop:  ## stop
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> stop...\n"
+    docker stop $(DOCKER_PROJECT_NAME); true
+    docker rm -f $(DOCKER_PROJECT_NAME) 2>/dev/null; true
+    docker volume prune --force 2>/dev/null; true
+    rm -rf tmp
+    sudo rm -rf ${DATA_FOLDER}
+    @echo -e "\n======================================================================\n"
+
+.PHONY: logs
+logs:  ## logs
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> logs...\n"
+    docker logs $(DOCKER_PROJECT_NAME)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: bash_container
+bash_container:  ## bash_container
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> bash_container...\n"
+    bash -c "clear && docker exec -it $(DOCKER_PROJECT_NAME) /bin/sh"
+    @echo -e "\n======================================================================\n"
+
+.PHONY: bash
+bash:  ## bash
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> bash...\n"
+    @# $(COMMAND) /bin/bash
+    $(DOCKER_RUN) --entrypoint "" $(DOCKER_PARAMETERS) -h $(DOCKER_PROJECT_NAME) --name $(DOCKER_PROJECT_NAME) $(DOCKER_REGISTRY)$(DOCKER_PROJECT):$(DOCKER_TAG) /bin/bash
     @echo -e "\n======================================================================\n"
 
 .PHONY: cp_default_config
@@ -3924,17 +3953,23 @@ stop_all:
     docker volume prune --force 2>/dev/null; true
     @echo -e "\n======================================================================\n"
 
-.PHONY: list
-list: ## list
+.PHONY: status
+status:  ## status
     @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> list...\n"
+    @echo -e "\n>>> status...\n"
     docker ps -a && echo
     docker volume ls && echo
     docker images && echo
     @echo -e "\n======================================================================\n"
 
+.PHONY: version
+version:  ## version
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> version...\n"
+    @echo -e "\n======================================================================\n"
+
 # .PHONY: curl
-# curl: ## curl
+# curl:  ## curl
 #      @echo -e "\n======================================================================\n"
 #      @echo -e "\n>>> curl...\n"
 #      @# curl -x 0.0.0.0:3128 -L http://www.google.com/
@@ -3942,42 +3977,42 @@ list: ## list
 #      @echo -e "\n======================================================================\n"
 
 # .PHONY: browser
-# browser: ## browser
+# browser:  ## browser
 #      @echo -e "\n======================================================================\n"
 #      @echo -e "\n>>> browser...\n"
 #      open http://localhost:${PORT}/
 #      @echo -e "\n======================================================================\n"
 
 .PHONY: compose_up
-compose_up: ## compose_up
+compose_up:  ## compose_up
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> compose_up...\n"
     docker-compose -f $(DOCKER_COMPOSE_FILE) up
     @echo -e "\n======================================================================\n"
 
 .PHONY: compose_down
-compose_down: ## compose_down
+compose_down:  ## compose_down
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> compose_down...\n"
     docker-compose -f $(DOCKER_COMPOSE_FILE) down
     @echo -e "\n======================================================================\n"
 
 .PHONY: compose_start
-compose_start: ## compose_start
+compose_start:  ## compose_start
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> compose_start...\n"
     docker-compose -f $(DOCKER_COMPOSE_FILE) start
     @echo -e "\n======================================================================\n"
 
 .PHONY: compose_stop
-compose_stop: ## compose_stop
+compose_stop:  ## compose_stop
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> compose_stop...\n"
     docker-compose -f $(DOCKER_COMPOSE_FILE) stop
     @echo -e "\n======================================================================\n"
 
 .PHONY: compose_ps
-compose_ps: ## compose_ps
+compose_ps:  ## compose_ps
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> compose_ps...\n"
     docker-compose -f $(DOCKER_COMPOSE_FILE) ps
@@ -4017,6 +4052,9 @@ function create_podman_app_project_makefile() {
         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
 # https://www.gnu.org/software/make/manual/make.html
 # https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html
+##### HOWTO #####
+
+##### VARIABLES #####
 # TOP_DIR=$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TOP_DIR=$(shell dirname $(abspath $(firstword $(MAKEFILE_LIST))))
 PROJECT_TYPE=
@@ -4046,7 +4084,7 @@ PODMAN_TAG=latest
 # SRC_DIR=
 # MOUNT_DIR=
 WEBUI_PORT=8080
-DAEMON_PORT=5000
+DAEMON_PORT=3000
 DB_NAME=
 DB_USER_NAME=
 DB_USER_PASSWORD=
@@ -4089,15 +4127,35 @@ PODMAN_RUN=podman run --rm -ti
 #     PODMAN_PASSWORD=
 # endif
 
-##### HOWTO #####
+DISTRO ?= $(shell cat /etc/*-release 2>/dev/null | uniq -u | grep ^ID= | cut -d = -f 2 | sed s/\"//g | sed s/linux/-linux/g && sw_vers -productName 2>/dev/null | sed 's/ //g' | tr A-Z a-z)
+OS ?= $(shell uname -s | tr A-Z a-z)
+ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 
+GITHUB_USER=
+GITHUB_PROJECT=
+GIT_COMMIT:=$(shell git rev-parse --short HEAD 2>/dev/null)-$(shell date "+%Y%m%d%H%M%S")
+GIT_TAG:=$(shell git describe --tags --dirty 2>/dev/null)
+
+# https://github.com/${GITHUB_USER}/${GITHUB_PROJECT}/releases
+ifneq ("$(wildcard VERSION.txt)", "")
+     PACKAGE_VERSION=$(shell grep -i PACKAGE_VERSION VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
+else ifdef LATEST
+     PACKAGE_VERSION=latest
+else
+     PACKAGE_VERSION ?= $(shell curl -s "https://api.github.com/repos/${GITHUB_USER}/${GITHUB_PROJECT}/releases/latest" | jq --raw-output .tag_name)
+endif
+
+##### INTERNAL VARIABLES #####
+# Read all subsequent tasks as arguments of the first task
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(args) $(RUN_ARGS):;@:)
 
 ##### ##### #####
 
 .DEFAULT_GOAL := help
 
 .PHONY: help
-help: ## help
+help:  ## help
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> help...\n"
     @#make -rpn | sed -n -e '/^$$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$$// ; p ; } ; }' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -4110,91 +4168,11 @@ all:  ## all
     @echo -e "\n>>> ...\n"
     make clean
     make build
-    make list
-    @echo -e "\n======================================================================\n"
-
-.PHONY: lint
-lint:  ## lint
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> lint...\n"
-    @echo -e "\n======================================================================\n"
-
-.PHONY: build
-build: ## build
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> build...\n"
-    @# make clean
-    @# podman build -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) .
-    podman build --rm -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) .
-    podman rmi $(shell podman images -f "dangling=true" -q) 2>/dev/null; true
-    @echo -e "\n======================================================================\n"
-
-.PHONY: nocache
-nocache: ## nocache
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> nocache...\n"
-    @# make clean
-    @# podman build -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) --no-cache .
-    podman build --rm -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) --no-cache .
-    podman rmi $(shell podman images -f "dangling=true" -q) 2>/dev/null; true
-    @echo -e "\n======================================================================\n"
-
-.PHONY: pull
-pull: ## pull
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> pull...\n"
-    podman pull $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG)
-    @echo -e "\n======================================================================\n"
-
-.PHONY: push
-push: ## push
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> push...\n"
-    podman push $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG)
-    @echo -e "\n======================================================================\n"
-
-.PHONY: run
-run: ## run
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> run...\n"
-    $(PODMAN_RUN) $(PODMAN_PARAMETERS) --name $(PODMAN_PROJECT_NAME) $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) $(PODMAN_COMMAND)
-    @echo -e "\n======================================================================\n"
-
-.PHONY: stop
-stop: ## stop
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> stop...\n"
-    podman stop $(PODMAN_PROJECT_NAME); true
-    podman rm -f $(PODMAN_PROJECT_NAME) 2>/dev/null; true
-    podman volume prune --force 2>/dev/null; true
-    rm -rf tmp
-    sudo rm -rf ${DATA_FOLDER}
-    @echo -e "\n======================================================================\n"
-
-.PHONY: logs
-logs: ## logs
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> logs...\n"
-    podman logs $(PODMAN_PROJECT_NAME)
-    @echo -e "\n======================================================================\n"
-
-.PHONY: bash_container
-bash_container: ## bash_container
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> bash_container...\n"
-    bash -c "clear && podman exec -it $(PODMAN_PROJECT_NAME) /bin/sh"
-    @echo -e "\n======================================================================\n"
-
-.PHONY: bash
-bash: ## bash
-    @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> bash...\n"
-    @# $(COMMAND) /bin/bash
-    $(PODMAN_RUN) --entrypoint "" $(PODMAN_PARAMETERS) -h $(PODMAN_PROJECT_NAME) --name $(PODMAN_PROJECT_NAME) $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) /bin/bash
+    make status
     @echo -e "\n======================================================================\n"
 
 .PHONY: clean
-clean: ## clean
+clean:  ## clean
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> clean...\n"
     podman rm -f $(PODMAN_PROJECT) 2>/dev/null; true
@@ -4207,6 +4185,93 @@ clean: ## clean
     @# find "$(TOP_DIR)" -type f -name "*.log" -print -delete;
     @# find "$(TOP_DIR)" -type f -name "*.pyc" -print -delete;
     @# find "$(TOP_DIR)" -type f -name "*.pid" -print -delete;
+    @echo -e "\n======================================================================\n"
+
+.PHONY: lint
+lint:  ## lint
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> lint...\n"
+    @echo -e "\n======================================================================\n"
+
+.PHONY: build
+build:  ## build
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> build...\n"
+    @# make clean
+    @# podman build -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) .
+    podman build --rm -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) .
+    podman rmi $(shell podman images -f "dangling=true" -q) 2>/dev/null; true
+    @echo -e "\n======================================================================\n"
+
+.PHONY: nocache
+nocache:  ## nocache
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> nocache...\n"
+    @# make clean
+    @# podman build -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) --no-cache .
+    podman build --rm -f $(PODMAN_FILE) -t $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) --no-cache .
+    podman rmi $(shell podman images -f "dangling=true" -q) 2>/dev/null; true
+    @echo -e "\n======================================================================\n"
+
+.PHONY: pull
+pull:  ## pull
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> pull...\n"
+    podman pull $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: push
+push:  ## push
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> push...\n"
+    podman push $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: run
+run:  ## run
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> run...\n"
+    $(PODMAN_RUN) $(PODMAN_PARAMETERS) --name $(PODMAN_PROJECT_NAME) $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) $(PODMAN_COMMAND)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: test
+test:  ## test
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> test...\n"
+    $(PODMAN_RUN) $(PODMAN_PARAMETERS) --name $(PODMAN_PROJECT_NAME) $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) $(PODMAN_COMMAND)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: stop
+stop:  ## stop
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> stop...\n"
+    podman stop $(PODMAN_PROJECT_NAME); true
+    podman rm -f $(PODMAN_PROJECT_NAME) 2>/dev/null; true
+    podman volume prune --force 2>/dev/null; true
+    rm -rf tmp
+    sudo rm -rf ${DATA_FOLDER}
+    @echo -e "\n======================================================================\n"
+
+.PHONY: logs
+logs:  ## logs
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> logs...\n"
+    podman logs $(PODMAN_PROJECT_NAME)
+    @echo -e "\n======================================================================\n"
+
+.PHONY: bash_container
+bash_container:  ## bash_container
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> bash_container...\n"
+    bash -c "clear && podman exec -it $(PODMAN_PROJECT_NAME) /bin/sh"
+    @echo -e "\n======================================================================\n"
+
+.PHONY: bash
+bash:  ## bash
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> bash...\n"
+    @# $(COMMAND) /bin/bash
+    $(PODMAN_RUN) --entrypoint "" $(PODMAN_PARAMETERS) -h $(PODMAN_PROJECT_NAME) --name $(PODMAN_PROJECT_NAME) $(PODMAN_REGISTRY)$(PODMAN_PROJECT):$(PODMAN_TAG) /bin/bash
     @echo -e "\n======================================================================\n"
 
 .PHONY: cp_default_config
@@ -4243,17 +4308,23 @@ stop_all:
     podman volume prune --force 2>/dev/null; true
     @echo -e "\n======================================================================\n"
 
-.PHONY: list
-list: ## list
+.PHONY: status
+status:  ## status
     @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> list...\n"
+    @echo -e "\n>>> status...\n"
     podman ps -a && echo
     podman volume ls && echo
     podman images && echo
     @echo -e "\n======================================================================\n"
 
+.PHONY: version
+version:  ## version
+    @echo -e "\n======================================================================\n"
+    @echo -e "\n>>> version...\n"
+    @echo -e "\n======================================================================\n"
+
 # .PHONY: curl
-# curl: ## curl
+# curl:  ## curl
 #      @echo -e "\n======================================================================\n"
 #      @echo -e "\n>>> curl...\n"
 #      @# curl -x 0.0.0.0:3128 -L http://www.google.com/
@@ -4261,7 +4332,7 @@ list: ## list
 #      @echo -e "\n======================================================================\n"
 
 # .PHONY: browser
-# browser: ## browser
+# browser:  ## browser
 #      @echo -e "\n======================================================================\n"
 #      @echo -e "\n>>> browser...\n"
 #      open http://localhost:${PORT}/
@@ -4371,7 +4442,7 @@ function create_terraform_app_project_makefile() {
     fi
 }
 
-function create_golang_app_project_makefile() {
+function golang_create_app_project_makefile() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -4400,6 +4471,9 @@ function create_golang_app_project_makefile() {
         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
 # https://www.gnu.org/software/make/manual/make.html
 # https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html
+##### HOWTO #####
+
+##### VARIABLES #####
 # TOP_DIR=$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TOP_DIR=$(shell dirname $(abspath $(firstword $(MAKEFILE_LIST))))
 PROJECT_TYPE=
@@ -4426,15 +4500,35 @@ PROJECT_NAME=$(notdir $(TOP_DIR))
 #     DOCKER_PASSWORD=
 # endif
 
-##### HOWTO #####
+DISTRO ?= $(shell cat /etc/*-release 2>/dev/null | uniq -u | grep ^ID= | cut -d = -f 2 | sed s/\"//g | sed s/linux/-linux/g && sw_vers -productName 2>/dev/null | sed 's/ //g' | tr A-Z a-z)
+OS ?= $(shell uname -s | tr A-Z a-z)
+ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 
+GITHUB_USER=
+GITHUB_PROJECT=
+GIT_COMMIT:=$(shell git rev-parse --short HEAD 2>/dev/null)-$(shell date "+%Y%m%d%H%M%S")
+GIT_TAG:=$(shell git describe --tags --dirty 2>/dev/null)
+
+# https://github.com/${GITHUB_USER}/${GITHUB_PROJECT}/releases
+ifneq ("$(wildcard VERSION.txt)", "")
+     PACKAGE_VERSION=$(shell grep -i PACKAGE_VERSION VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
+else ifdef LATEST
+     PACKAGE_VERSION=latest
+else
+     PACKAGE_VERSION ?= $(shell curl -s "https://api.github.com/repos/${GITHUB_USER}/${GITHUB_PROJECT}/releases/latest" | jq --raw-output .tag_name)
+endif
+
+##### INTERNAL VARIABLES #####
+# Read all subsequent tasks as arguments of the first task
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(args) $(RUN_ARGS):;@:)
 
 ##### ##### #####
 
 .DEFAULT_GOAL := help
 
 .PHONY: help
-help: ## help
+help:  ## help
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> help...\n"
     @#make -rpn | sed -n -e '/^$$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$$// ; p ; } ; }' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -4447,7 +4541,7 @@ all:  ## all
     @echo -e "\n>>> ...\n"
     make clean
     make build
-    make list
+    make status
     @echo -e "\n======================================================================\n"
 
 .PHONY: lint
@@ -4457,7 +4551,7 @@ lint:  ## lint
     @echo -e "\n======================================================================\n"
 
 .PHONY: init
-init: ## init
+init:  ## init
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> init...\n"
     @# mkdir src tests
@@ -4467,7 +4561,7 @@ init: ## init
     @echo -e "\n======================================================================\n"
 
 .PHONY: build
-build: ## build
+build:  ## build
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> build...\n"
     @# mkdir -p $(TOP_DIR)/data/bin
@@ -4475,14 +4569,14 @@ build: ## build
     @echo -e "\n======================================================================\n"
 
 .PHONY: run
-run: ## run
+run:  ## run
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> run...\n"
     $(TOP_DIR)/$(PROJECT_NAME)
     @echo -e "\n======================================================================\n"
 
 .PHONY: test
-test: ## test
+test:  ## test
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> test...\n"
     go build
@@ -4491,17 +4585,17 @@ test: ## test
     @echo -e "\n======================================================================\n"
 
 .PHONY: clean
-clean: ## clean
+clean:  ## clean
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> clean...\n"
     rm -rf $(TOP_DIR)/$(PROJECT_NAME)
     rm -rf $(TOP_DIR)/data/bin
     @echo -e "\n======================================================================\n"
 
-.PHONY: list
-list:  ## list
+.PHONY: status
+list:  ## status
     @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> list...\n"
+    @echo -e "\n>>> status...\n"
     @echo -e "\n======================================================================\n"
 *EOF*
         unexpand -a -t 4 "${PROJECT_DIR:?}/${FILENAME}" >"${PROJECT_DIR:?}/${FILENAME}.tmp"
@@ -4509,7 +4603,7 @@ list:  ## list
     fi
 }
 
-function create_typescript_app_project_makefile() {
+function typescript_create_app_project_makefile() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -4538,6 +4632,9 @@ function create_typescript_app_project_makefile() {
         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
 # https://www.gnu.org/software/make/manual/make.html
 # https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html
+##### HOWTO #####
+
+##### VARIABLES #####
 # TOP_DIR=$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TOP_DIR=$(shell dirname $(abspath $(firstword $(MAKEFILE_LIST))))
 PROJECT_TYPE=
@@ -4564,15 +4661,35 @@ PROJECT_NAME=$(notdir $(TOP_DIR))
 #     DOCKER_PASSWORD=
 # endif
 
-##### HOWTO #####
+DISTRO ?= $(shell cat /etc/*-release 2>/dev/null | uniq -u | grep ^ID= | cut -d = -f 2 | sed s/\"//g | sed s/linux/-linux/g && sw_vers -productName 2>/dev/null | sed 's/ //g' | tr A-Z a-z)
+OS ?= $(shell uname -s | tr A-Z a-z)
+ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 
+GITHUB_USER=
+GITHUB_PROJECT=
+GIT_COMMIT:=$(shell git rev-parse --short HEAD 2>/dev/null)-$(shell date "+%Y%m%d%H%M%S")
+GIT_TAG:=$(shell git describe --tags --dirty 2>/dev/null)
+
+# https://github.com/${GITHUB_USER}/${GITHUB_PROJECT}/releases
+ifneq ("$(wildcard VERSION.txt)", "")
+     PACKAGE_VERSION=$(shell grep -i PACKAGE_VERSION VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
+else ifdef LATEST
+     PACKAGE_VERSION=latest
+else
+     PACKAGE_VERSION ?= $(shell curl -s "https://api.github.com/repos/${GITHUB_USER}/${GITHUB_PROJECT}/releases/latest" | jq --raw-output .tag_name)
+endif
+
+##### INTERNAL VARIABLES #####
+# Read all subsequent tasks as arguments of the first task
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(args) $(RUN_ARGS):;@:)
 
 ##### ##### #####
 
 .DEFAULT_GOAL := help
 
 .PHONY: help
-help: ## help
+help:  ## help
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> help...\n"
     @#make -rpn | sed -n -e '/^$$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$$// ; p ; } ; }' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -4585,29 +4702,29 @@ all:  ## all
     @echo -e "\n>>> ...\n"
     make clean
     make build
-    make list
+    make status
     @echo -e "\n======================================================================\n"
 
 .PHONY: lint
 lint:  ## lint
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> lint...\n"
-    eslint --ext .ts --fix
+    eslint --ext .js,.jsx,.ts,.tsx --fix
     @echo -e "\n======================================================================\n"
 
 .PHONY: init
-init: ## init
+init:  ## init
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> init...\n"
     @# mkdir src tests
-    @# sudo npm install --global typescript ts-node
+    @# sudo npm install -g typescript ts-node
     nvm use --lts # --lts | node | default
     npm init -y
     tsc --init
     @echo -e "\n======================================================================\n"
 
 .PHONY: build
-build: ## build
+build:  ## build
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> build...\n"
     @# mkdir -p $(TOP_DIR)/data/bin
@@ -4615,18 +4732,18 @@ build: ## build
     @echo -e "\n======================================================================\n"
 
 .PHONY: run
-run: ## run
+run:  ## run
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> run...\n"
     node src/main.js
     @echo -e "\n======================================================================\n"
 
 .PHONY: test
-test: ## test
+test:  ## test
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> test...\n"
     @# npm install typescript ts-node @types/node --save-dev
-    @# sudo npm install --global chai mocha nyc jasmine jest ts-jest
+    @# sudo npm install -g chai mocha nyc jasmine jest ts-jest
     @# npm install -D chai mocha nyc @types/mocha @types/chai
     @# npm install -D nyc jasmine @types/jasmine
     @# npm install -D jest ts-jest @types/jest
@@ -4636,7 +4753,7 @@ test: ## test
     @echo -e "\n======================================================================\n"
 
 .PHONY: clean
-clean: ## clean
+clean:  ## clean
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> clean...\n"
     rm -rf $(TOP_DIR)/$(PROJECT_NAME)
@@ -4644,10 +4761,10 @@ clean: ## clean
     rm -rf src/main.js package-lock.json node_modules .nyc_output
     @echo -e "\n======================================================================\n"
 
-.PHONY: list
-list:  ## list
+.PHONY: status
+list:  ## status
     @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> list...\n"
+    @echo -e "\n>>> status...\n"
     @echo -e "\n======================================================================\n"
 *EOF*
         unexpand -a -t 4 "${PROJECT_DIR:?}/${FILENAME}" >"${PROJECT_DIR:?}/${FILENAME}.tmp"
@@ -4655,7 +4772,7 @@ list:  ## list
     fi
 }
 
-function create_python3_app_project_makefile() {
+function python3_create_app_project_makefile() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -4684,6 +4801,9 @@ function create_python3_app_project_makefile() {
         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
 # https://www.gnu.org/software/make/manual/make.html
 # https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html
+##### HOWTO #####
+
+##### VARIABLES #####
 # TOP_DIR=$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TOP_DIR=$(shell dirname $(abspath $(firstword $(MAKEFILE_LIST))))
 PROJECT_TYPE=
@@ -4710,15 +4830,35 @@ PROJECT_NAME=$(notdir $(TOP_DIR))
 #     DOCKER_PASSWORD=
 # endif
 
-##### HOWTO #####
+DISTRO ?= $(shell cat /etc/*-release 2>/dev/null | uniq -u | grep ^ID= | cut -d = -f 2 | sed s/\"//g | sed s/linux/-linux/g && sw_vers -productName 2>/dev/null | sed 's/ //g' | tr A-Z a-z)
+OS ?= $(shell uname -s | tr A-Z a-z)
+ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 
+GITHUB_USER=
+GITHUB_PROJECT=
+GIT_COMMIT:=$(shell git rev-parse --short HEAD 2>/dev/null)-$(shell date "+%Y%m%d%H%M%S")
+GIT_TAG:=$(shell git describe --tags --dirty 2>/dev/null)
+
+# https://github.com/${GITHUB_USER}/${GITHUB_PROJECT}/releases
+ifneq ("$(wildcard VERSION.txt)", "")
+     PACKAGE_VERSION=$(shell grep -i PACKAGE_VERSION VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
+else ifdef LATEST
+     PACKAGE_VERSION=latest
+else
+     PACKAGE_VERSION ?= $(shell curl -s "https://api.github.com/repos/${GITHUB_USER}/${GITHUB_PROJECT}/releases/latest" | jq --raw-output .tag_name)
+endif
+
+##### INTERNAL VARIABLES #####
+# Read all subsequent tasks as arguments of the first task
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(args) $(RUN_ARGS):;@:)
 
 ##### ##### #####
 
 .DEFAULT_GOAL := help
 
 .PHONY: help
-help: ## help
+help:  ## help
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> help...\n"
     @#make -rpn | sed -n -e '/^$$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$$// ; p ; } ; }' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -4731,7 +4871,7 @@ all:  ## all
     @echo -e "\n>>> ...\n"
     make clean
     make build
-    make list
+    make status
     @echo -e "\n======================================================================\n"
 
 .PHONY: lint
@@ -4741,43 +4881,43 @@ lint:  ## lint
     @echo -e "\n======================================================================\n"
 
 .PHONY: init
-init: ## init
+init:  ## init
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> init...\n"
     @# mkdir src tests
     @echo -e "\n======================================================================\n"
 
 .PHONY: build
-build: ## build
+build:  ## build
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> build...\n"
     @# mkdir -p $(TOP_DIR)/data/bin
     @echo -e "\n======================================================================\n"
 
 .PHONY: run
-run: ## run
+run:  ## run
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> run...\n"
     @echo -e "\n======================================================================\n"
 
 .PHONY: test
-test: ## test
+test:  ## test
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> test...\n"
     @echo -e "\n======================================================================\n"
 
 .PHONY: clean
-clean: ## clean
+clean:  ## clean
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> clean...\n"
     rm -rf $(TOP_DIR)/$(PROJECT_NAME)
     rm -rf $(TOP_DIR)/data/bin
     @echo -e "\n======================================================================\n"
 
-.PHONY: list
-list:  ## list
+.PHONY: status
+list:  ## status
     @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> list...\n"
+    @echo -e "\n>>> status...\n"
     @echo -e "\n======================================================================\n"
 *EOF*
         unexpand -a -t 4 "${PROJECT_DIR:?}/${FILENAME}" >"${PROJECT_DIR:?}/${FILENAME}.tmp"
@@ -4785,7 +4925,7 @@ list:  ## list
     fi
 }
 
-function create_rust_app_project_makefile() {
+function rust_create_app_project_makefile() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME> [<OFFICIAL_PROJECT>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -4814,6 +4954,9 @@ function create_rust_app_project_makefile() {
         cat <<\*EOF* >"${PROJECT_DIR:?}/${FILENAME}"
 # https://www.gnu.org/software/make/manual/make.html
 # https://www.gnu.org/software/make/manual/html_node/Simple-Makefile.html
+##### HOWTO #####
+
+##### VARIABLES #####
 # TOP_DIR=$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 TOP_DIR=$(shell dirname $(abspath $(firstword $(MAKEFILE_LIST))))
 PROJECT_TYPE=
@@ -4840,15 +4983,35 @@ PROJECT_NAME=$(notdir $(TOP_DIR))
 #     DOCKER_PASSWORD=
 # endif
 
-##### HOWTO #####
+DISTRO ?= $(shell cat /etc/*-release 2>/dev/null | uniq -u | grep ^ID= | cut -d = -f 2 | sed s/\"//g | sed s/linux/-linux/g && sw_vers -productName 2>/dev/null | sed 's/ //g' | tr A-Z a-z)
+OS ?= $(shell uname -s | tr A-Z a-z)
+ARCH ?= $(shell uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 
+GITHUB_USER=
+GITHUB_PROJECT=
+GIT_COMMIT:=$(shell git rev-parse --short HEAD 2>/dev/null)-$(shell date "+%Y%m%d%H%M%S")
+GIT_TAG:=$(shell git describe --tags --dirty 2>/dev/null)
+
+# https://github.com/${GITHUB_USER}/${GITHUB_PROJECT}/releases
+ifneq ("$(wildcard VERSION.txt)", "")
+     PACKAGE_VERSION=$(shell grep -i PACKAGE_VERSION VERSION.txt | cut -d '=' -f 2 | tr -d '[:space:]')
+else ifdef LATEST
+     PACKAGE_VERSION=latest
+else
+     PACKAGE_VERSION ?= $(shell curl -s "https://api.github.com/repos/${GITHUB_USER}/${GITHUB_PROJECT}/releases/latest" | jq --raw-output .tag_name)
+endif
+
+##### INTERNAL VARIABLES #####
+# Read all subsequent tasks as arguments of the first task
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(args) $(RUN_ARGS):;@:)
 
 ##### ##### #####
 
 .DEFAULT_GOAL := help
 
 .PHONY: help
-help: ## help
+help:  ## help
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> help...\n"
     @#make -rpn | sed -n -e '/^$$/ { n ; /^[^ .#][^ ]*:/ { s/:.*$$// ; p ; } ; }' | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -4861,7 +5024,7 @@ all:  ## all
     @echo -e "\n>>> ...\n"
     make clean
     make build
-    make list
+    make status
     @echo -e "\n======================================================================\n"
 
 .PHONY: lint
@@ -4873,7 +5036,7 @@ lint:  ## lint
     @echo -e "\n======================================================================\n"
 
 .PHONY: init
-init: ## init
+init:  ## init
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> init...\n"
     @# mkdir src tests
@@ -4881,7 +5044,7 @@ init: ## init
     @echo -e "\n======================================================================\n"
 
 .PHONY: build
-build: ## build
+build:  ## build
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> build...\n"
     @# mkdir -p $(TOP_DIR)/data/bin
@@ -4891,7 +5054,7 @@ build: ## build
     @echo -e "\n======================================================================\n"
 
 .PHONY: run
-run: ## run
+run:  ## run
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> run...\n"
     $(TOP_DIR)/target/debug/$(PROJECT_NAME)
@@ -4900,14 +5063,14 @@ run: ## run
     @echo -e "\n======================================================================\n"
 
 .PHONY: test
-test: ## test
+test:  ## test
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> test...\n"
     cargo test
     @echo -e "\n======================================================================\n"
 
 .PHONY: clean
-clean: ## clean
+clean:  ## clean
     @echo -e "\n======================================================================\n"
     @echo -e "\n>>> clean...\n"
     rm -rf $(TOP_DIR)/$(PROJECT_NAME)
@@ -4916,10 +5079,10 @@ clean: ## clean
     rm -rf .git .gitignore Cargo.lock Cargo.toml
     @echo -e "\n======================================================================\n"
 
-.PHONY: list
-list:  ## list
+.PHONY: status
+list:  ## status
     @echo -e "\n======================================================================\n"
-    @echo -e "\n>>> list...\n"
+    @echo -e "\n>>> status...\n"
     @echo -e "\n======================================================================\n"
 *EOF*
         unexpand -a -t 4 "${PROJECT_DIR:?}/${FILENAME}" >"${PROJECT_DIR:?}/${FILENAME}.tmp"
@@ -4939,7 +5102,7 @@ function clean_project() {
         cd "${TOP_DIR:?}" || exit 1
 
         if [ "$#" == "1" ]; then
-            local DISTPROJECT_TYPERO=${1}
+            local PROJECT_TYPE=${1}
         fi
 
         case ${PROJECT_TYPE} in
@@ -5257,7 +5420,7 @@ function clean_rust_app_project() {
 #******************************************************************************
 # Coding Test - Golang
 
-function golang_create_project() {
+function golang_create_project_skeleton() {
     if [ "$#" != "0" ] && [ "$#" != "4" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -5409,7 +5572,7 @@ function golang_build_and_run_project() {
     fi
 }
 
-function golang_build_and_run_test() {
+function golang_build_and_test() {
     if [ "$#" != "0" ] && [ "$#" != "4" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -5458,7 +5621,7 @@ function golang_clean_project() {
 #******************************************************************************
 # Coding Test - Python 3
 
-function python3_create_project() {
+function python3_create_project_skeleton() {
     if [ "$#" != "0" ] && [ "$#" != "4" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -5573,7 +5736,7 @@ function python3_build_and_run_project() {
     fi
 }
 
-function python3_build_and_run_test() {
+function python3_build_and_test() {
     if [ "$#" != "0" ] && [ "$#" != "4" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -5620,7 +5783,7 @@ function python3_clean_project() {
 #******************************************************************************
 # Coding Test - Rust
 
-function rust_create_project() {
+function rust_create_project_skeleton() {
     if [ "$#" != "0" ] && [ "$#" != "4" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -5737,7 +5900,7 @@ function rust_build_and_run_project() {
     fi
 }
 
-function rust_build_and_run_test() {
+function rust_build_and_test() {
     if [ "$#" != "0" ] && [ "$#" != "4" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -5788,7 +5951,7 @@ function rust_clean_project() {
 #******************************************************************************
 # Coding Test - typescript
 
-function typescript_create_project() {
+function typescript_create_project_skeleton() {
     if [ "$#" != "0" ] && [ "$#" != "4" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -5952,14 +6115,18 @@ function typescript_init_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
         cd "${PROJECT_DIR}" || exit 1
 
         nvm use --lts # --lts | node | default
-        # sudo npm install --global typescript ts-node
+        # sudo npm install -g typescript ts-node
         npm init -y
         tsc --init # npx tsc --init
         # npm install -D eslint eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser
@@ -5980,7 +6147,11 @@ function typescript_build_and_run_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -5991,7 +6162,7 @@ function typescript_build_and_run_project() {
     fi
 }
 
-function typescript_build_and_run_test() {
+function typescript_build_and_test() {
     if [ "$#" != "0" ] && [ "$#" != "4" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -6003,14 +6174,18 @@ function typescript_build_and_run_test() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
         cd "${PROJECT_DIR}" || exit 1
 
         # npm install typescript ts-node @types/node --save-dev
-        # sudo npm install --global chai mocha nyc jasmine jest ts-jest
+        # sudo npm install -g chai mocha nyc jasmine jest ts-jest
         # npm install -D chai mocha nyc @types/mocha @types/chai
         # npm install -D nyc jasmine @types/jasmine
         # npm install -D jest ts-jest @types/jest
@@ -6032,7 +6207,11 @@ function typescript_clean_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6075,8 +6254,8 @@ function typescript_create_reactjs_project() {
         npm install -D webpack webpack-cli webpack-dev-server webpack-node-externals clean-webpack-plugin webpack-merge copy-webpack-plugin html-webpack-plugin terser-webpack-plugin
         npm install -D ts-loader css-loader style-loader ts-node
 
-        # "include": ["src/**/*.ts, "src/**/*.tsx"],
-        # "exclude": ["node_modules"]
+        # "include": [ "src/**/*.ts, "src/**/*.tsx" ],
+        # "exclude": [ "node_modules" ]
         #         cat <<\*EOF* >"${PROJECT_DIR}/tsconfig.json"
         # *EOF*
 
@@ -6119,7 +6298,11 @@ function typescript_init_reactjs_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6157,7 +6340,11 @@ function typescript_create_reactjs_dockerfile() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6166,35 +6353,78 @@ function typescript_create_reactjs_dockerfile() {
 
         cat <<\*EOF* >"${PROJECT_DIR}/dockerfile"
 # FROM node:latest
-FROM node:alpine
+# FROM node:alpine
+FROM node:14.18.1
 # FROM alpine_base/alpine_nodejs:latest
 
 WORKDIR /project
 
 COPY package.json .
-COPY package-lock.json .
+# COPY package-lock.json .
 RUN npm install
 
-ENV PORT 5000
-EXPOSE 5000
-
 # Method 1: run source code
+# COPY . .
 COPY . /project
-CMD ["npm", "run", "start:dev" ]
-# CMD ["npm", "run", "start"]
+CMD [ "npm", "run", "start:dev" ]
+# CMD [ "npm", "run", "start" ]
 
 # # Method 1: run source code
+# COPY . .
 # COPY . /project
-# CMD [ "node", "./src/server.js",  ]
+# CMD [ "node", "./src/server.js" ]
 
 # # Method 4: compile externally and run from entrypoint
 # RUN apk add --update --no-cache bash && \
 #     rm -rf /var/cache/apk/*
+# COPY . .
 # COPY . /project
 # COPY entrypoint.sh /usr/bin/entrypoint.sh
 # RUN chmod +x /usr/bin/entrypoint.sh
-# ENTRYPOINT ["entrypoint.sh"]
+# ENTRYPOINT [ "entrypoint.sh" ]
+*EOF*
+    fi
+}
 
+function typescript_create_reactjs_dot_dockerignore_file() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/.dockerignore"
+**/.git
+**/.DS_Store
+**/node_modules
+*.log
+Dockerfile*
+docker-compose*
+package-lock.json
+.dockerignore
+.git
+.gitignore
+.vscode
+.mysqldata
+.postgresdata
+.mongodbdata
+.redisdata
 *EOF*
     fi
 }
@@ -6211,33 +6441,24 @@ function typescript_create_reactjs_dockercompose_file() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=true
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=false
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=false
         fi
 
         # mkdir -p ${PROJECT_DIR}
         cd "${PROJECT_DIR}" || exit 1
 
-        cat <<\*EOF* >"${PROJECT_DIR}/docker-compose.yml"
-# https://docs.docker.com/compose/compose-file/
-# https://docs.docker.com/engine/reference/commandline/cli/
-# https://docs.docker.com/compose/compose-file/compose-versioning/
-# https://docs.docker.com/engine/reference/commandline/volume_create
-version: '3.9'
-services:
-  frontend:
-    build: .
-    ports:
-      - '3000:3000'
-    volumes:
-      - .:/project
-    # depends_on:
-    #   - backend
-    #   - db_mysql
-    #   - db_postgres
-    #   - db_mongodb
-    #   - redis
-*EOF*
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VERSION} == true ]; then
+            docker_compose_file_create_version "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+        docker_compose_file_create_frontend "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}" false false false
     fi
 }
 
@@ -6280,7 +6501,11 @@ function typescript_init_nextjs_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6408,7 +6633,11 @@ function typescript_create_reactjs_extension_manifest_v2() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6430,7 +6659,11 @@ function typescript_create_reactjs_extension_manifest_v3() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6470,8 +6703,8 @@ function typescript_create_reactjs_extension_manifest_v3() {
   },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["contentScript.js"]
+      "matches": [ "http://*/*", "https://*/*" ],
+      "js": [ "contentScript.js" ]
     }
   ],
   "options_page": "options.html"
@@ -6492,7 +6725,11 @@ function typescript_init_reactjs_extension_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6532,7 +6769,11 @@ function typescript_set_package_json_for_reactjs_extension_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6558,15 +6799,19 @@ function typescript_set_tsconfig_json_for_reactjs_extension_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
         # mkdir -p ${PROJECT_DIR}
         cd "${PROJECT_DIR}" || exit 1
 
-        # "include": ["src/**/*.ts, "src/**/*.tsx"],
-        # "exclude": ["node_modules"]
+        # "include": [ "src/**/*.ts, "src/**/*.tsx" ],
+        # "exclude": [ "node_modules" ]
         sed -i 's/\/\/ "jsx": "preserve",/"jsx": "react",      /g' "${PROJECT_DIR}/tsconfig.json"
         sed -i 's/"module": "commonjs",/"module": "es6",/g     ' "${PROJECT_DIR}/tsconfig.json"
         sed -i 's/"target": "es5",/"target": "es6",/g' "${PROJECT_DIR}/tsconfig.json"
@@ -6586,7 +6831,11 @@ function typescript_set_webpack_config_js_for_reactjs_extension_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6705,7 +6954,11 @@ function typescript_create_gitignore_for_reactjs_extension_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6753,7 +7006,11 @@ function typescript_download_license_for_reactjs_extension_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6776,7 +7033,11 @@ function typescript_download_icons_for_reactjs_extension_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6803,7 +7064,11 @@ function typescript_create_readme_for_reactjs_extension_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=${4}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6866,7 +7131,11 @@ function typescript_create_nestjs_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6891,7 +7160,11 @@ function typescript_init_nestjs_project() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6901,7 +7174,7 @@ function typescript_init_nestjs_project() {
         nvm use --lts # --lts | node | default
         npm install -D typescript ts-node
         npm install -D eslint eslint-config-prettier eslint-plugin-prettier @typescript-eslint/eslint-plugin @typescript-eslint/parser
-        # npm install -D webpack webpack-cli webpack-dev-server webpack-node-externals clean-webpack-plugin webpack-merge copy-webpack-plugin html-webpack-plugin terser-webpack-plugin
+        npm install -D webpack webpack-cli webpack-dev-server webpack-node-externals clean-webpack-plugin webpack-merge copy-webpack-plugin html-webpack-plugin terser-webpack-plugin
         # npm install -D zip-webpack-plugin
         # new WebpackZipPlugin({
         #     frontShell: 'ls',
@@ -6911,24 +7184,53 @@ function typescript_init_nestjs_project() {
         #     behindShell: 'scp **'
         # }),
         npm install class-transformer class-validator
+        npm install ajv ajv-keywords
+        npm install joi
         # npm install dotenv @types/dotenv
         # npm install uuid @types/uuid
         npm install tsconfig-paths @nestjs/config
-        npm install bcrypt bcryptjs @types/bcryptjs
-        npm install passport passport-jwt @types/passport-jwt @nestjs/passport @nestjs/jwt
-        # npm install @nestjs/swagger swagger-ui-express
-        # npm install @nestjs/swagger fastify-swagger
-        # npm install @grpc/grpc-js @grpc/proto-loader
-        # npm install redis
-        # npm install kafkajs
+
+        npm install bcrypt bcryptjs @types/bcrypt @types/bcryptjs
+        npm install @nestjs/passport passport@0.4.1
+        npm install passport-jwt @types/passport-jwt @nestjs/jwt
+
         npm install cookie-parser @types/cookie-parser
         npm install @nestjs/mapped-types
-        npm install typeorm @nestjs/typeorm
-        # npm install mysql mysql2 pg sqlite3
-        npm install mysql2
-        # npm install mongoose @nestjs/mongoose
 
-        # rm ${PROJECT_DIR}/src/app.controller.spec.ts ${PROJECT_DIR}/src/app.controller.ts ${PROJECT_DIR}/src/app.service.ts
+        if [ ${ENABLE_SWAGGER} == true ]; then
+            # npm install @nestjs/swagger swagger-ui-express
+            npm install @nestjs/swagger fastify-swagger
+        fi
+        if [ ${ENABLE_GRPC} == true ]; then
+            npm install @grpc/grpc-js @grpc/proto-loader
+        fi
+
+        if [ ${ENABLE_DB_MYSQL} == true ]; then
+            npm install typeorm @nestjs/typeorm
+            # npm install mysql
+            npm install mysql2
+        fi
+        if [ ${ENABLE_DB_POSTGRES} == true ]; then
+            npm install typeorm @nestjs/typeorm
+            npm install pg
+        fi
+        if [ ${ENABLE_DB_MONGODB} == true ]; then
+            npm install typeorm @nestjs/typeorm
+            npm install mongoose @nestjs/mongoose
+        fi
+        if [ ${ENABLE_DB_SQLITE3} == true ]; then
+            npm install typeorm @nestjs/typeorm
+            npm install sqlite3
+        fi
+
+        if [ ${ENABLE_QUEUE_REDIS} == true ]; then
+            npm install redis
+        fi
+        if [ ${ENABLE_QUEUE_KAFKA} == true ]; then
+            npm install kafkajs
+        fi
+
+        # rm ${PROJECT_DIR}/src/app.controller.spec.ts ${PROJECT_DIR}/src/app.controller.ts ${PROJECT_DIR}/src/app.service.ts ${PROJECT_DIR}/test/app.e2e-spec.ts
         # nest generate resource ${RESOURCE_NAME}
     fi
 }
@@ -6945,7 +7247,11 @@ function typescript_create_nestjs_dockerfile() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
@@ -6954,40 +7260,85 @@ function typescript_create_nestjs_dockerfile() {
 
         cat <<\*EOF* >"${PROJECT_DIR}/dockerfile"
 # FROM node:latest
-FROM node:alpine
+# FROM node:alpine
+FROM node:14.18.1
 # FROM alpine_base/alpine_nodejs:latest
 
 WORKDIR /project
 
 COPY package.json .
-COPY package-lock.json .
+# COPY package-lock.json .
+# RUN npm install rimraf @nestjs/cli @nestjs/common @nestjs/core
 RUN npm install
 
-ENV PORT 5000
-EXPOSE 5000
-
 # Method 1: run source code
+# COPY . .
 COPY . /project
-CMD ["npm", "run", "start:dev" ]
-# CMD ["npm", "run", "start"]
+CMD [ "npm", "run", "start:dev" ]
+# CMD [ "npm", "run", "start" ]
 
 # # Method 1: run source code
+# COPY . .
 # COPY . /project
-# CMD [ "node", "./src/server.js",  ]
+# CMD [ "node", "./src/server.js" ]
 
 # # Method 4: compile externally and run from entrypoint
 # RUN apk add --update --no-cache bash && \
 #     rm -rf /var/cache/apk/*
+# COPY . .
 # COPY . /project
 # COPY entrypoint.sh /usr/bin/entrypoint.sh
 # RUN chmod +x /usr/bin/entrypoint.sh
-# ENTRYPOINT ["entrypoint.sh"]
-
+# ENTRYPOINT [ "entrypoint.sh" ]
 *EOF*
+
+        cat <<\*EOF* >"${PROJECT_DIR}/dockerfile"
+# FROM node:latest
+# FROM node:alpine
+FROM node:14.18.1 as development
+# FROM alpine_base/alpine_nodejs:latest
+
+WORKDIR /project
+
+COPY package.json .
+# COPY package-lock.json .
+RUN npm install rimraf @nestjs/cli @nestjs/common @nestjs/core
+RUN npm install --only=development
+
+# Method 1: run source code
+# COPY . .
+COPY . /project
+
+RUN npm run build
+
+# FROM node:latest
+# FROM node:alpine
+FROM node:14.18.1 as production
+# FROM alpine_base/alpine_nodejs:latest
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+WORKDIR /project
+
+COPY package.json .
+# COPY package-lock.json .
+RUN npm install rimraf @nestjs/cli @nestjs/common @nestjs/core
+RUN npm install --only=production
+
+# Method 1: run source code
+# COPY . .
+# COPY . /project
+
+COPY --from=development /project/dist ./dist
+
+CMD ["node", "/project/dist/main"]
+*EOF*
+
     fi
 }
 
-function typescript_create_nestjs_dockercompose_file() {
+function typescript_create_nestjs_dot_dockerignore_file() {
     if [ "$#" != "0" ] && [ "$#" != "4" ]; then
         log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -6999,101 +7350,115 @@ function typescript_create_nestjs_dockercompose_file() {
             local SRC_ROOT=${1}
             local GIT_PROVIDER=${2}
             local PROJECT_USER=${3}
-            local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
             local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
         fi
 
         # mkdir -p ${PROJECT_DIR}
         cd "${PROJECT_DIR}" || exit 1
 
-        cat <<\*EOF* >"${PROJECT_DIR}/docker-compose.yml"
-# https://docs.docker.com/compose/compose-file/
-# https://docs.docker.com/engine/reference/commandline/cli/
-# https://docs.docker.com/compose/compose-file/compose-versioning/
-# https://docs.docker.com/engine/reference/commandline/volume_create
-version: '3.9'
-services:
-  backend:
-    build: .
-    ports:
-      - '3000:3000'
-    volumes:
-      - .:/project
-    depends_on:
-      - db_mysql
-    #   - db_postgres
-    #   - db_mongodb
-    #   - redis
-  db_mysql:
-    image: mysql:5.7.35
-    restart: always
-    environment:
-      MYSQL_DATABASE: mysqldb
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pass
-      MYSQL_ROOT_PASSWORD: root
-    ports:
-      - '3306:3306'
-    expose:
-      - '3306'
-    volumes:
-      - .mysqldata:/var/lib/mysql
-    # healthcheck:
-    #   test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
-    #   interval: 30s
-    #   timeout: 30s
-    #   retries: 3
-  db_postgres:
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_DB: gresdb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
-      POSTGRES_ROOT_PASSWORD: root
-    #   PGDATA: "/data/postgres"
-    ports:
-      - '5432:5432'
-    expose:
-      - '5432'
-    volumes:
-      - .postgresdata:/var/lib/postgres/data
-    # healthcheck:
-    #   test: ["CMD-SHELL", "su -c 'pg_isready -U postgres' postgres"]
-    #   interval: 30s
-    #   timeout: 30s
-    #   retries: 3
-  db_mongodb:
-    image: mongo:latest
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
-    ports:
-      - '27017:27017'
-    expose:
-      - '27017'
-    volumes:
-      - .mongodbdata:/var/lib/mongodb
-    # healthcheck:
-    #   test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --quiet | grep
-    #   interval: 10s
-    #   timeout: 10s
-    #   retries: 5
-    #   start_period: 40s
-  redis:
-    image: redis:latest
-    restart: always
-    environment:
-      - REDIS_REPLICATION_MODE=master
-    # entrypoint: redis-server --appendonly yes
-    volumes:
-      - .redisdata:/data
-    ports:
-      - '6379:6379'
-    expose:
-      - '6379'
+        cat <<\*EOF* >"${PROJECT_DIR}/.dockerignore"
+**/.git
+**/.DS_Store
+**/node_modules
+*.log
+Dockerfile*
+docker-compose*
+package-lock.json
+.dockerignore
+.git
+.gitignore
+.vscode
 *EOF*
+    fi
+}
+
+function typescript_create_nestjs_dockercompose_file() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "7" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=true
+            local ENABLE_FRONTEND=false
+            local ENABLE_BACKEND=false
+            local ENABLE_DB_MYSQL=false
+            local ENABLE_DB_POSTGRES=false
+            local ENABLE_DB_MONGODB=false
+            local ENABLE_QUEUE_REDIS=false
+            local ENABLE_QUEUE_KAFKA=false
+            local ENABLE_MONITOR_GRAFANA=false
+            local ENABLE_MONITOR_PROMETHEUS=false
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=true
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=true
+        elif [ "$#" == "7" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=${5}
+            # local ENABLE_FRONTEND=${6}
+            # local ENABLE_BACKEND=${7}
+            # local ENABLE_DB_MYSQL=${8}
+            # local ENABLE_DB_POSTGRES=${9}
+            # local ENABLE_DB_MONGODB=${10}
+            # local ENABLE_QUEUE_REDIS=${11}
+            # local ENABLE_QUEUE_KAFKA=${12}
+            # local ENABLE_MONITOR_GRAFANA=${13}
+            # local ENABLE_MONITOR_PROMETHEUS=${14}
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=${6}
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=${7}
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VERSION} == true ]; then
+            docker_compose_file_create_version "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+        # docker_compose_file_create_frontend "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}" false false false
+        docker_compose_file_create_backend "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}" false false false
+
+        if [ ${ENABLE_DB_MYSQL} == true ]; then
+            docker_compose_file_create_db_mysql "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}" false false false
+        fi
+        if [ ${ENABLE_DB_POSTGRES} == true ]; then
+            docker_compose_file_create_db_postgres "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}" false false false
+        fi
+        if [ ${ENABLE_DB_MONGODB} == true ]; then
+            docker_compose_file_create_db_mongodb "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}" false false false
+        fi
+        if [ ${ENABLE_QUEUE_REDIS} == true ]; then
+            docker_compose_file_create_queue_redis "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}" false false false
+        fi
+
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VOLUMES} == true ]; then
+            docker_compose_file_create_volumes "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_NETWORKS} == true ]; then
+            docker_compose_file_create_networks "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
     fi
 }
 
@@ -7762,8 +8127,8 @@ function install_by_npm() {
 
         if [ ${PROJECT_NPM_GLOBAL} == true ]; then
             # [ $(npm list -g ${PROJECT_NPM_BIN} | grep empty | wc -l) == 0 ]
-            sudo npm install --global ${PROJECT_NPM_BIN}
-            # sudo npm install --global --unsafe-perm ${PROJECT_NPM_BIN} #--verbose
+            sudo npm install -g ${PROJECT_NPM_BIN}
+            # sudo npm install -g --unsafe-perm ${PROJECT_NPM_BIN} #--verbose
             # sudo npm cache clean --force
             # echo "Typescript: $(tsc --version)"
             echo "$(npm list -g ${PROJECT_NPM_BIN})"
@@ -9798,7 +10163,7 @@ function build_project() {
         cd "${TOP_DIR:?}" || exit 1
 
         if [ "$#" == "1" ]; then
-            local DISTPROJECT_TYPERO=${1}
+            local PROJECT_TYPE=${1}
         fi
 
         case ${PROJECT_TYPE} in
@@ -12322,8 +12687,10 @@ function nvm_install_nodejs() {
         nvm use --lts # --lts | default | node | ${NODE_VERSION}
         nvm ls
         source ${HOME}/.bash_profile
+        # npm install -g npm@latest
         echo "Node: $(node --version)"
         echo "Npm: $(npm --version)"
+        npm doctor
     fi
 }
 
@@ -12339,7 +12706,7 @@ function nvm_uninstall_nodejs() {
             local NODE_VERSION=${1}
         fi
 
-        nvm use -lts # --lts | default | node | ${NODE_VERSION}
+        nvm use --lts # --lts | default | node | ${NODE_VERSION}
         nvm uninstall ${NODE_VERSION}
         nvm ls
         source ${HOME}/.bash_profile
@@ -12365,11 +12732,57 @@ function nvm_update_nodejs() {
 
         nvm install ${NODE_VERSION} --latest-npm --reinstall-packages-from=${NODE_VERSION}
         # nvm install --lts --latest-npm --reinstall-packages-from='lts/*'
-        nvm use -lts # --lts | default | node | ${NODE_VERSION}
+        nvm use --lts # --lts | default | node | ${NODE_VERSION}
         nvm ls
         source ${HOME}/.bash_profile
+        # npm install -g npm@latest
         echo "Node: $(node --version)"
         echo "Npm: $(npm --version)"
+        npm doctor
+    fi
+}
+
+function nvm_set_default() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <NODE_VERSION>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "1" ]; then
+            local NODE_VERSION=${1}
+        fi
+
+        # nvm ls-remote --lts
+        # nvm install --lts
+
+        nvm alias default ${NODE_VERSION}
+        nvm use default
+        nvm ls
+        echo "Node: $(node --version)"
+        echo "Npm: $(npm --version)"
+        # npm doctor
+    fi
+}
+
+function nvm_use() {
+    if [ "$#" != "0" ] && [ "$#" != "1" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <NODE_VERSION>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "1" ]; then
+            local NODE_VERSION=${1}
+        fi
+
+        nvm use ${NODE_VERSION}
+        nvm ls
+        echo "Node: $(node --version)"
+        echo "Npm: $(npm --version)"
+        # npm doctor
     fi
 }
 
@@ -13024,7 +13437,7 @@ function docker_remove() {
 
 function docker_clean() {
     if [ "$#" != "0" ]; then
-        log_e "Usage: ${FUNCNAME[0]} [<DOCKER_USER>] [<DOCKER_REGISTRY|0.0.0.0:5000>] <DOCKER_PROJECT> <DOCKER_TAG>"
+        log_e "Usage: ${FUNCNAME[0]} [<DOCKER_USER>] [<DOCKER_REGISTRY|0.0.0.0:3000>] <DOCKER_PROJECT> <DOCKER_TAG>"
         log_e "${FUNCNAME[0]} $# ${*}"
     else
         log_m "${FUNCNAME[0]} $# ${*}"
@@ -13046,7 +13459,7 @@ function docker_clean() {
 # https://docs.docker.com/docker-cloud/builds/push-images/
 function docker_tag_and_publish() {
     if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "6" ]; then
-        log_e "Usage: ${FUNCNAME[0]} <DOCKER_USER> <DOCKER_PASSWORD> [<PROTOCOL> <DOCKER_REGISTRY|0.0.0.0:5000>] <DOCKER_PROJECT> <DOCKER_TAG>"
+        log_e "Usage: ${FUNCNAME[0]} <DOCKER_USER> <DOCKER_PASSWORD> [<PROTOCOL> <DOCKER_REGISTRY|0.0.0.0:3000>] <DOCKER_PROJECT> <DOCKER_TAG>"
         log_e "${FUNCNAME[0]} $# ${*}"
     else
         log_m "${FUNCNAME[0]} $# ${*}"
@@ -13061,7 +13474,7 @@ function docker_tag_and_publish() {
             local DOCKER_USER=${1} # ${GITHUB_USER}
             local DOCKER_PASSWORD=${2}
             local PROTOCOL=${3}        # http | https
-            local DOCKER_REGISTRY=${4} # 0.0.0.0:5000
+            local DOCKER_REGISTRY=${4} # 0.0.0.0:3000
             local DOCKER_PROJECT=${5}  # ${GITHUB_PROJECT}
             local DOCKER_TAG=${6}      # latest | latest-alpine | v0.0.1
         fi
@@ -13654,6 +14067,580 @@ function docker_remove_images_in_remote_host() {
 }
 
 #******************************************************************************
+# docker-compose files
+
+function docker_compose_file_create_version() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<\*EOF* >"${PROJECT_DIR}/docker-compose.yml"
+# https://docs.docker.com/compose/compose-file/
+# https://docs.docker.com/engine/reference/commandline/cli/
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+# https://docs.docker.com/engine/reference/commandline/volume_create
+version: '3.9'
+
+services:
+*EOF*
+    fi
+}
+
+function docker_compose_file_create_volumes() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<*EOF* >>"${PROJECT_DIR}/docker-compose.yml"
+volumes:
+  ${PROJECT_NAME}-volume:
+#     external: true
+*EOF*
+    fi
+}
+
+function docker_compose_file_create_networks() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        cat <<*EOF* >>"${PROJECT_DIR}/docker-compose.yml"
+networks:
+  ${PROJECT_NAME}-network: {}
+#   hostnet:
+#     external: true
+#     name: host
+#   nonet:
+#     external: true
+#     name: none
+#   default:
+#     external:
+#       name: virbr0
+*EOF*
+    fi
+}
+
+function docker_compose_file_create_frontend() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "7" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=true
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=false
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=false
+        elif [ "$#" == "7" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=${5}
+            # local ENABLE_FRONTEND=${6}
+            # local ENABLE_BACKEND=${7}
+            # local ENABLE_DB_MYSQL=${8}
+            # local ENABLE_DB_POSTGRES=${9}
+            # local ENABLE_DB_MONGODB=${10}
+            # local ENABLE_QUEUE_REDIS=${11}
+            # local ENABLE_QUEUE_KAFKA=${12}
+            # local ENABLE_MONITOR_GRAFANA=${13}
+            # local ENABLE_MONITOR_PROMETHEUS=${14}
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=${6}
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=${7}
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VERSION} == true ]; then
+            docker_compose_file_create_version "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+
+        cat <<\*EOF* >>"${PROJECT_DIR}/docker-compose.yml"
+  frontend:
+    build: .
+    ports:
+      - '8001:3001'
+    volumes:
+      - .:/project
+    # depends_on:
+    #   - backend
+*EOF*
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VOLUMES} == true ]; then
+            docker_compose_file_create_volumes "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_NETWORKS} == true ]; then
+            docker_compose_file_create_networks "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+    fi
+}
+
+function docker_compose_file_create_backend() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "7" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=true
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=false
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=false
+        elif [ "$#" == "7" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=${5}
+            # local ENABLE_FRONTEND=${6}
+            # local ENABLE_BACKEND=${7}
+            # local ENABLE_DB_MYSQL=${8}
+            # local ENABLE_DB_POSTGRES=${9}
+            # local ENABLE_DB_MONGODB=${10}
+            # local ENABLE_QUEUE_REDIS=${11}
+            # local ENABLE_QUEUE_KAFKA=${12}
+            # local ENABLE_MONITOR_GRAFANA=${13}
+            # local ENABLE_MONITOR_PROMETHEUS=${14}
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=${6}
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=${7}
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VERSION} == true ]; then
+            docker_compose_file_create_version "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+
+        cat <<\*EOF* >>"${PROJECT_DIR}/docker-compose.yml"
+  backend:
+    build: .
+    ports:
+      - '8000:3000'
+    volumes:
+      - .:/project
+    # depends_on:
+    #   - db_mysql
+    #   - db_postgres
+    #   - db_mongodb
+    #   - redis
+*EOF*
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VOLUMES} == true ]; then
+            docker_compose_file_create_volumes "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_NETWORKS} == true ]; then
+            docker_compose_file_create_networks "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+    fi
+}
+
+function docker_compose_file_create_db_mysql() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "7" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=true
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=false
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=false
+        elif [ "$#" == "7" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=${5}
+            # local ENABLE_FRONTEND=${6}
+            # local ENABLE_BACKEND=${7}
+            # local ENABLE_DB_MYSQL=${8}
+            # local ENABLE_DB_POSTGRES=${9}
+            # local ENABLE_DB_MONGODB=${10}
+            # local ENABLE_QUEUE_REDIS=${11}
+            # local ENABLE_QUEUE_KAFKA=${12}
+            # local ENABLE_MONITOR_GRAFANA=${13}
+            # local ENABLE_MONITOR_PROMETHEUS=${14}
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=${6}
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=${7}
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VERSION} == true ]; then
+            docker_compose_file_create_version "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+
+        cat <<\*EOF* >>"${PROJECT_DIR}/docker-compose.yml"
+  db_mysql:
+    image: mysql:5.7.36
+    restart: always
+    environment:
+      MYSQL_DATABASE: mysqldb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - .mysqldata:/var/lib/mysql
+    # healthcheck:
+    #   test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+    #   interval: 30s
+    #   timeout: 30s
+    #   retries: 3
+*EOF*
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VOLUMES} == true ]; then
+            docker_compose_file_create_volumes "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_NETWORKS} == true ]; then
+            docker_compose_file_create_networks "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+    fi
+}
+
+function docker_compose_file_create_db_postgres() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "7" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=true
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=false
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=false
+        elif [ "$#" == "7" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=${5}
+            # local ENABLE_FRONTEND=${6}
+            # local ENABLE_BACKEND=${7}
+            # local ENABLE_DB_MYSQL=${8}
+            # local ENABLE_DB_POSTGRES=${9}
+            # local ENABLE_DB_MONGODB=${10}
+            # local ENABLE_QUEUE_REDIS=${11}
+            # local ENABLE_QUEUE_KAFKA=${12}
+            # local ENABLE_MONITOR_GRAFANA=${13}
+            # local ENABLE_MONITOR_PROMETHEUS=${14}
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=${6}
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=${7}
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VERSION} == true ]; then
+            docker_compose_file_create_version "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+
+        cat <<\*EOF* >>"${PROJECT_DIR}/docker-compose.yml"
+  db_postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: gresdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_ROOT_PASSWORD: root
+    #   PGDATA: "/data/postgres"
+    ports:
+      - '5432:5432'
+    expose:
+      - '5432'
+    volumes:
+      - .postgresdata:/var/lib/postgres/data
+    # healthcheck:
+    #   test: [ "CMD-SHELL", "su -c 'pg_isready -U postgres' postgres" ]
+    #   interval: 30s
+    #   timeout: 30s
+    #   retries: 3
+*EOF*
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VOLUMES} == true ]; then
+            docker_compose_file_create_volumes "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_NETWORKS} == true ]; then
+            docker_compose_file_create_networks "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+    fi
+}
+
+function docker_compose_file_create_db_mongodb() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "7" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=true
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=false
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=false
+        elif [ "$#" == "7" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=${5}
+            # local ENABLE_FRONTEND=${6}
+            # local ENABLE_BACKEND=${7}
+            # local ENABLE_DB_MYSQL=${8}
+            # local ENABLE_DB_POSTGRES=${9}
+            # local ENABLE_DB_MONGODB=${10}
+            # local ENABLE_QUEUE_REDIS=${11}
+            # local ENABLE_QUEUE_KAFKA=${12}
+            # local ENABLE_MONITOR_GRAFANA=${13}
+            # local ENABLE_MONITOR_PROMETHEUS=${14}
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=${6}
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=${7}
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VERSION} == true ]; then
+            docker_compose_file_create_version "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+
+        cat <<\*EOF* >>"${PROJECT_DIR}/docker-compose.yml"
+  db_mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    ports:
+      - '27017:27017'
+    expose:
+      - '27017'
+    volumes:
+      - .mongodbdata:/var/lib/mongodb
+    # healthcheck:
+    #   test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --quiet | grep
+    #   interval: 10s
+    #   timeout: 10s
+    #   retries: 5
+    #   start_period: 40s
+*EOF*
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VOLUMES} == true ]; then
+            docker_compose_file_create_volumes "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_NETWORKS} == true ]; then
+            docker_compose_file_create_networks "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+    fi
+}
+
+function docker_compose_file_create_queue_redis() {
+    if [ "$#" != "0" ] && [ "$#" != "4" ] && [ "$#" != "7" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <SRC_ROOT> <GIT_PROVIDER : bitbucket.com | github.com | gitlab.com> <PROJECT_USER> <PROJECT_NAME>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        # cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "4" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=true
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=false
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=false
+        elif [ "$#" == "7" ]; then
+            local SRC_ROOT=${1}
+            local GIT_PROVIDER=${2}
+            local PROJECT_USER=${3}
+            if [ -e "${SRC_ROOT}/${4}" ]; then
+                local PROJECT_NAME=${4}
+            else
+                local PROJECT_NAME=$(echo ${4} | sed 's/_/-/g')
+            fi
+            local PROJECT_DIR="${SRC_ROOT}/${PROJECT_NAME}" # "${SRC_ROOT}/${GIT_PROVIDER}/${PROJECT_USER}/${PROJECT_NAME}"
+            local WRITE_DOCKER_COMPOSE_FILE_VERSION=${5}
+            # local ENABLE_FRONTEND=${6}
+            # local ENABLE_BACKEND=${7}
+            # local ENABLE_DB_MYSQL=${8}
+            # local ENABLE_DB_POSTGRES=${9}
+            # local ENABLE_DB_MONGODB=${10}
+            # local ENABLE_QUEUE_REDIS=${11}
+            # local ENABLE_QUEUE_KAFKA=${12}
+            # local ENABLE_MONITOR_GRAFANA=${13}
+            # local ENABLE_MONITOR_PROMETHEUS=${14}
+            local WRITE_DOCKER_COMPOSE_FILE_VOLUMES=${6}
+            local WRITE_DOCKER_COMPOSE_FILE_NETWORKS=${7}
+        fi
+
+        # mkdir -p ${PROJECT_DIR}
+        cd "${PROJECT_DIR}" || exit 1
+
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VERSION} == true ]; then
+            docker_compose_file_create_version "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+
+        cat <<\*EOF* >>"${PROJECT_DIR}/docker-compose.yml"
+  redis:
+    image: redis:latest
+    restart: always
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    # entrypoint: redis-server --appendonly yes
+    volumes:
+      - .redisdata:/data
+    ports:
+      - '6379:6379'
+    expose:
+      - '6379'
+*EOF*
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_VOLUMES} == true ]; then
+            docker_compose_file_create_volumes "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+        if [ ${WRITE_DOCKER_COMPOSE_FILE_NETWORKS} == true ]; then
+            docker_compose_file_create_networks "${SRC_ROOT}" "${GIT_PROVIDER}" "${PROJECT_USER}" "${PROJECT_NAME}"
+        fi
+    fi
+}
+
+#******************************************************************************
 # docker-compose
 
 function docker_compose_up() {
@@ -13668,6 +14655,8 @@ function docker_compose_up() {
             local DOCKER_COMPOSE_FILE=${1}
         fi
 
+        docker-compose -f ${DOCKER_COMPOSE_FILE} pull
+        # docker-compose -f ${DOCKER_COMPOSE_FILE} build
         docker-compose -f ${DOCKER_COMPOSE_FILE} up # --detach
     fi
 }
@@ -13685,6 +14674,7 @@ function docker_compose_down() {
         fi
 
         docker-compose -f ${DOCKER_COMPOSE_FILE} down
+        docker-compose -f ${DOCKER_COMPOSE_FILE} rm -f
     fi
 }
 
@@ -13717,6 +14707,7 @@ function docker_compose_stop() {
         fi
 
         docker-compose -f ${DOCKER_COMPOSE_FILE} stop
+        docker-compose -f ${DOCKER_COMPOSE_FILE} rm -f
     fi
 }
 
@@ -13759,6 +14750,44 @@ function docker_compose_top() {
 
         echo -e "\n>>> Show Docker Services...\n"
         docker-compose -f ${DOCKER_COMPOSE_FILE} top
+    fi
+}
+
+function docker_compose_bash() {
+    if [ "$#" != "0" ] && [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <DOCKER_COMPOSE_FILE> <SERVICE>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "2" ]; then
+            local DOCKER_COMPOSE_FILE=${1}
+            local SERVICE=${2}
+        fi
+
+        echo -e "\n>>> Show Docker Services...\n"
+        docker-compose -f ${DOCKER_COMPOSE_FILE} exec ${SERVICE} /bin/bash
+        # docker-compose -f ${DOCKER_COMPOSE_FILE} run ${SERVICE} /bin/bash
+    fi
+}
+
+function docker_compose_sh() {
+    if [ "$#" != "0" ] && [ "$#" != "2" ]; then
+        log_e "Usage: ${FUNCNAME[0]} <DOCKER_COMPOSE_FILE> <SERVICE>"
+        log_e "${FUNCNAME[0]} $# ${*}"
+    else
+        log_m "${FUNCNAME[0]} $# ${*}"
+        cd "${TOP_DIR:?}" || exit 1
+
+        if [ "$#" == "2" ]; then
+            local DOCKER_COMPOSE_FILE=${1}
+            local SERVICE=${2}
+        fi
+
+        echo -e "\n>>> Show Docker Services...\n"
+        docker-compose -f ${DOCKER_COMPOSE_FILE} exec ${SERVICE} /bin/sh
+        # docker-compose -f ${DOCKER_COMPOSE_FILE} run ${SERVICE} /bin/sh
     fi
 }
 
@@ -14934,7 +15963,7 @@ function packer_build() {
 # Ansible
 
 # https://code-maven.com/getting-started-with-ansible-centos
-function remote_module_action() {
+function ansible_remote_module_action() {
     if [ "$#" != "5" ] && [ "$#" != "6" ]; then
         log_e "Usage: ${FUNCNAME[0]} <PLATFORM> <SSH_USER> <SSH_GROUP> <SSH_PASSWORD> <MODULE> [<ACTION>]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -14964,10 +15993,10 @@ function remote_module_action() {
         fi
     fi
 }
-# remote_module_action "${PLATFORM}" "${SSH_USER}" "${SSH_GROUP}" "${SSH_PASSWORD}" "${MODULE}"
+# ansible_remote_module_action "${PLATFORM}" "${SSH_USER}" "${SSH_GROUP}" "${SSH_PASSWORD}" "${MODULE}"
 
 # https://code-maven.com/getting-started-with-ansible-centos
-function remote_action() {
+function ansible_remote_action() {
     if [ "$#" != "5" ]; then
         log_e "Usage: ${FUNCNAME[0]} <PLATFORM> <SSH_USER> <SSH_GROUP> <SSH_PASSWORD> <REMOTE_ACTION>"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -14991,9 +16020,9 @@ function remote_action() {
         # ansible --inventory "inventories/${1}/hosts" --user "${2}" "${3}" --args "${5}" # --ssh-common-args "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
     fi
 }
-# remote_action "${PLATFORM}" "${SSH_USER}" "${SSH_GROUP}" "${SSH_PASSWORD}" "${REMOTE_ACTION}"
+# ansible_remote_action "${PLATFORM}" "${SSH_USER}" "${SSH_GROUP}" "${SSH_PASSWORD}" "${REMOTE_ACTION}"
 
-function playbook() {
+function ansible_playbook() {
     if [ "$#" != "5" ] && [ "$#" != "6" ]; then
         log_e "Usage: ${FUNCNAME[0]} <PLATFORM> <SSH_USER> <SSH_GROUP> <SSH_PASSWORD> <PLAYBOOK> [ARGS]"
         log_e "${FUNCNAME[0]} $# ${*}"
@@ -15022,7 +16051,7 @@ function playbook() {
         fi
     fi
 }
-# playbook "${PLATFORM}" "${SSH_USER}" "${SSH_GROUP}" "${SSH_PASSWORD}" "${PLAYBOOK}" '{ "hosts": ["remotes"] }'
+# playbook "${PLATFORM}" "${SSH_USER}" "${SSH_GROUP}" "${SSH_PASSWORD}" "${PLAYBOOK}" '{ "hosts": [ "remotes" ] }'
 
 #******************************************************************************
 # iscsi

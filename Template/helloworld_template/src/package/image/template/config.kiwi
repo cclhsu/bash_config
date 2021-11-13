@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<image schemaversion="6.7" name="my-container" xmlns:suse_label_helper="com.suse.label_helper">
+
+  <description type="system">
+    <author>Fabian Vogt</author>
+    <contact>fvogt@suse.com</contact>
+    <specification>Minimal derived container example</specification>
+  </description>
+
+  <preferences>
+    <type image="docker" derived_from="obsrepositories:/suse/sle15#15.3">
+      <containerconfig
+        name="my-container"
+        tag="latest"
+        additionaltags="1.0.0,1.0.0-%RELEASE%">
+         <labels>
+          <suse_label_helper:add_prefix prefix="com.suse.example">
+            <label name="org.opencontainers.image.title" value="SUSE Linux Enterprise Example"/>
+            <label name="org.opencontainers.image.description" value="Example Image on SUSE Linux Enterprise 15 SP2"/>
+            <label name="org.opencontainers.image.version" value="1.0.%RELEASE%"/>
+            <label name="org.opencontainers.image.created" value="%BUILDTIME%"/>
+            <label name="org.opencontainers.image.vendor" value="SUSE LLC"/>
+            <label name="org.opencontainers.image.url" value="https://www.suse.com/products/server/"/>
+            <label name="org.opensuse.reference" value="registry.suse.com/my_container:1.0.0-%RELEASE%"/>
+            <label name="org.openbuildservice.disturl" value="%DISTURL%"/>
+          </suse_label_helper:add_prefix>
+        </labels>
+        <history author="Fabian Vogt &lt;fvogt@suse.com&gt;">Derive the image</history>
+       </containerconfig>
+    </type>
+    <version>1.0.0</version>
+    <packagemanager>zypper</packagemanager>
+    <rpm-check-signatures>false</rpm-check-signatures>
+    <rpm-excludedocs>true</rpm-excludedocs>
+    <locale>en_US</locale>
+    <keytable>us.map.gz</keytable>
+    <hwclock>utc</hwclock>
+  </preferences>
+
+  <packages type="image">
+    <!-- Just an example package -->
+    <package name="ca-certificates"/>
+  </packages>
+
+  <repository type='rpm-md'>
+    <source path='obsrepositories:/'/>
+  </repository>
+</image>
+

@@ -1,0 +1,10 @@
+<services>
+    <service name="replace_using_get_version" mode="buildtime">
+        <param name="file">caasp-{{ PACKAGE_NAME }}-image.kiwi</param>
+        <param name="regex">%%PKG_VERSION%%</param>
+        <param name="parse-version">patch</param>
+        <param name="package">{{ PACKAGE_NAME }}</param>
+    </service>
+    <service mode="buildtime" name="kiwi_metainfo_helper"/>
+    <service mode="buildtime" name="kiwi_label_helper"/>
+</services>

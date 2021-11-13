@@ -1,0 +1,16 @@
+# https://docs.docker.com/compose/compose-file/
+# https://docs.docker.com/engine/reference/commandline/cli/
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+# https://docs.docker.com/engine/reference/commandline/volume_create
+version: '3.9'
+networks:
+  helloworld_network: {}
+services:
+  helloworld:
+    # build: .
+    image: alpine_base/helloworld:latest
+    # image: cclhsu/helloworld:latest
+    container_name: helloworld
+    hostname: helloworld
+    ports:
+      - 8080:8080

@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: helloworld
+  namespace: default
+  # namespace: kube-system
+  labels:
+    app: helloworld
+spec:
+  containers:
+  - name: helloworld
+    image: alpine:latest
+    imagePullPolicy: Always # Always | Never | IfNotPresent
+    command: ['/bin/sh']
+    args: ['-c', 'i=0; while true; do echo "$HOSTNAME - $i: $(date): Hello, World!"; i=$((i+1)); sleep .01; done']
+    # args: ['-c', 'i=0; while true; do echo "$HOSTNAME - $i: Hello, World!"; i=$((i+1)); sleep .01; done']
+    # args: ['-c', 'echo "hello, stdout!"; echo "hello, stderr!" >&2']
+    # command: [ "echo" ]
+    # args: [ "Hello, Alpine!" ]
+    # securityContext:
+    #   allowPrivilegeEscalation: true
+    resources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+#     ports:
+#     - name: helloworld-svc
+#       containerPort: 3000
+#       protocol: TCP
+#     volumeMounts:
+#     - name: var-log
+#       mountPath: /var/log
+# volumes:
+# - name: var-log
+#   emptyDir: {}

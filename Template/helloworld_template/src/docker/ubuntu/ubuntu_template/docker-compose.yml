@@ -1,0 +1,58 @@
+# https://docs.docker.com/compose/compose-file/
+# https://docs.docker.com/engine/reference/commandline/cli/
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+# https://docs.docker.com/engine/reference/commandline/volume_create
+version: '3.9'
+# volumes:
+#   ubuntu-template-etc-volume: {}
+#   ubuntu-template-var-volume: {}
+#   # ubuntu-template-tmp-volume: {}
+networks:
+  ubuntu_template_network: {}
+services:
+  ubuntu_template:
+    # build: .
+    image: ubuntu_base/ubuntu_template:latest
+    container_name: ubuntu_template
+    # restart: always
+    hostname: ubuntu_template
+    # env_file:
+    #   - env_file/ubuntu_template.env
+    environment:
+      # PATH: /app:$PATH
+      # PYTHONPATH: /app:$PYTHONPATH
+      MODE: default
+      START_ARGS: /bin/bash
+    # command: python test.py
+    ports:
+      - 22:22
+      - 80:80
+      - 443:443
+      - 873:873
+      - 127.0.0.1:1110:1110
+    # labels:
+    #   ubuntu_template.cluster: "ubuntu_template"
+    volumes:
+      - ./app:/project/app
+      - ./appfs/data:/project/data
+      # - ./appfs/logs:/project/logs
+      # - ./src:/project/src
+      # - ./tests:/project/tests
+      # - ./rootfs/default:/etc/default
+      # - ./rootfs/etc:/etc/app
+      # - ./rootfs/var:/opt/app/var
+      # - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # - ubuntu-template-etc-volume:/etc/app
+      # - ubuntu-template-var-volume:/opt/app/var
+      # - ubuntu-template-var-volume:/opt/app/tmp
+    # networks:
+    #   ubuntu_template_network:
+    #     aliases:
+    #       - ubuntu_template
+    # restart: always
+    # entrypoint: /bin/bash
+    # stdin_open: true
+    # tty: true
+    # depends_on:
+    #   - zookeeper
+    #   - kafka

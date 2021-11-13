@@ -1,0 +1,20 @@
+export HADOOP_HOME=/opt/hadoop/default
+export PATH=${PATH}:${HADOOP_HOME}/sbin:${HADOOP_HOME}/bin
+export HADOOP_ROOT=/opt/hadoop-root
+export HADOOP_USER=hduser
+export HADOOP_GROUP=hadoop
+# export HADOOP_OPTS="-Djava.library.path=${HADOOP_HOME}/lib/native"
+# export HADOOP_COMMON_LIB_NATIVE_DIR=${HADOOP_HOME}/lib/native
+export HADOOP_VERSION=2.90
+export HADOOP_PREFIX=${HADOOP_HOME}
+export HADOOP_COMMON_HOME=${HADOOP_HOME}
+export HADOOP_HDFS_HOME=${HADOOP_HOME}
+export HADOOP_MAPRED_HOME=${HADOOP_HOME}
+export HADOOP_YARN_HOME=${HADOOP_HOME}
+export HADOOP_CONF_DIR=${HADOOP_HOME}/etc/hadoop
+export YARN_CONF_DIR=${HADOOP_HOME}/etc/hadoop
+export YARN_IDENT_STRING=hduser
+export HADOOP_SSH_OPTS="-F /home/hduser/.ssh/config"
+export HADOOP_CLUSTERNAME=wolverine
+export HADOOP_ROLE=STANDALONE
+export CATALINA_OUT=/dev/stdout
